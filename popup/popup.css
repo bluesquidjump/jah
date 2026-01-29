@@ -1,0 +1,164 @@
+/* JAH Popup Styles */
+
+:root {
+  --jah-blue: #117aca;
+  --jah-navy: #004b87;
+  --jah-light-blue: #7aacdc;
+  --jah-pale-blue: #e9f3f8;
+  --jah-white: #ffffff;
+  --jah-bg-light: #f7f7f7;
+  --jah-border: #d4d4d4;
+  --jah-text: #333333;
+  --jah-text-muted: #666666;
+  --jah-success: #1a8754;
+  --jah-danger: #c41230;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  background: var(--jah-white);
+  color: var(--jah-text);
+  width: 280px;
+  min-height: 200px;
+}
+
+.popup-container {
+  padding: 16px;
+}
+
+/* Header */
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--jah-navy);
+  margin-bottom: 16px;
+}
+
+.popup-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.popup-title h1 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--jah-navy);
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.popup-subtitle {
+  font-size: 10px;
+  color: var(--jah-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Actions */
+.popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.popup-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.popup-btn-primary {
+  background: var(--jah-navy);
+  color: var(--jah-white);
+}
+
+.popup-btn-primary:hover {
+  background: var(--jah-blue);
+}
+
+.popup-btn-secondary {
+  background: var(--jah-bg-light);
+  color: var(--jah-navy);
+  border: 1px solid var(--jah-border);
+}
+
+.popup-btn-secondary:hover {
+  background: var(--jah-pale-blue);
+  border-color: var(--jah-light-blue);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.btn-text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Status */
+.popup-status {
+  background: var(--jah-bg-light);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.status-label {
+  color: var(--jah-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-value {
+  font-weight: 600;
+}
+
+.status-value.configured {
+  color: var(--jah-success);
+}
+
+.status-value.not-configured {
+  color: var(--jah-danger);
+}
+
+/* Footer */
+.popup-footer {
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--jah-border);
+}
+
+.version {
+  font-size: 10px;
+  color: var(--jah-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}

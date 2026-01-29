@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAH</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <img src="../icons/kitsune-48.png" alt="JAH" class="popup-logo">
+      <div class="popup-title">
+        <h1>JAH</h1>
+        <span class="popup-subtitle">JA4 Hash Enrichment</span>
+      </div>
+    </header>
+
+    <div class="popup-actions">
+      <button id="open-sidebar" class="popup-btn popup-btn-primary">
+        <span class="btn-icon">📊</span>
+        <span class="btn-text">Open Sidebar</span>
+      </button>
+
+      <button id="open-settings" class="popup-btn popup-btn-secondary">
+        <span class="btn-icon">⚙️</span>
+        <span class="btn-text">Settings</span>
+      </button>
+    </div>
+
+    <div class="popup-status" id="status-section">
+      <div class="status-item">
+        <span class="status-label">API Key:</span>
+        <span class="status-value" id="api-status">Checking...</span>
+      </div>
+    </div>
+
+    <footer class="popup-footer">
+      <span class="version">v1.1.3</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
