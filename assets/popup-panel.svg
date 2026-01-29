@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="280" viewBox="0 0 320 280">
+  <!-- Panel shadow -->
+  <rect x="6" y="6" width="308" height="268" fill="#00000020" rx="4"/>
+
+  <!-- Panel background -->
+  <rect x="0" y="0" width="308" height="268" fill="#ffffff" rx="4" stroke="#d4d4d4"/>
+
+  <!-- Header -->
+  <rect x="1" y="1" width="306" height="44" fill="#004b87" rx="4 4 0 0"/>
+  <rect x="1" y="42" width="306" height="3" fill="#117aca"/>
+  <text x="18" y="28" font-family="Georgia, serif" font-size="16" fill="white">JA4 Analysis</text>
+  <text x="285" y="28" font-family="Arial, sans-serif" font-size="18" fill="white" opacity="0.8">×</text>
+
+  <!-- Hash display -->
+  <rect x="1" y="45" width="306" height="32" fill="#f7f7f7"/>
+  <text x="18" y="66" font-family="Monaco, monospace" font-size="10" fill="#004b87">t13d1517h2_8daaf6152771_b0da82dd1658</text>
+
+  <!-- Type badge -->
+  <rect x="18" y="85" width="36" height="18" fill="#004b87" rx="2"/>
+  <text x="36" y="97" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle" font-weight="bold">JA4</text>
+
+  <!-- Category badge -->
+  <rect x="18" y="112" width="70" height="20" fill="#c41230" rx="2"/>
+  <text x="53" y="126" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle" font-weight="bold">MALWARE</text>
+
+  <!-- Content sections -->
+  <text x="18" y="152" font-family="Arial, sans-serif" font-size="9" fill="#666666" font-weight="bold">JA4DB APPLICATIONS</text>
+  <text x="18" y="168" font-family="Arial, sans-serif" font-size="12" fill="#333333">Sliver C2 Framework</text>
+
+  <line x1="18" y1="180" x2="290" y2="180" stroke="#d4d4d4"/>
+
+  <text x="18" y="198" font-family="Arial, sans-serif" font-size="9" fill="#666666" font-weight="bold">DATABASE</text>
+  <text x="18" y="214" font-family="Arial, sans-serif" font-size="12" fill="#333333">12 matches, 1,547 observations</text>
+
+  <!-- Footer -->
+  <rect x="1" y="232" width="306" height="35" fill="#f7f7f7" rx="0 0 4 4"/>
+  <line x1="1" y1="232" x2="307" y2="232" stroke="#d4d4d4"/>
+  <text x="32" y="254" font-family="Arial, sans-serif" font-size="11" fill="#666666">📋 Full details: View → Sidebar → JAH</text>
+</svg>

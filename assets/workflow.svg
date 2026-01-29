@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="140" viewBox="0 0 700 140">
+  <!-- Background -->
+  <rect width="700" height="140" fill="#ffffff"/>
+
+  <!-- Step 1: Detect -->
+  <rect x="20" y="30" width="140" height="80" fill="#f7f7f7" rx="4" stroke="#d4d4d4"/>
+  <text x="90" y="55" font-family="Arial, sans-serif" font-size="10" fill="#004b87" text-anchor="middle" font-weight="bold">1. DETECT</text>
+  <text x="90" y="75" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">JAH scans pages</text>
+  <text x="90" y="90" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">for JA4 hashes</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 165 70 L 195 70" stroke="#117aca" stroke-width="2" fill="none"/>
+  <polygon points="195,65 205,70 195,75" fill="#117aca"/>
+
+  <!-- Step 2: Flag -->
+  <rect x="210" y="30" width="140" height="80" fill="#f7f7f7" rx="4" stroke="#d4d4d4"/>
+  <text x="280" y="55" font-family="Arial, sans-serif" font-size="10" fill="#004b87" text-anchor="middle" font-weight="bold">2. FLAG</text>
+  <text x="280" y="75" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">Fox icon appears</text>
+  <text x="280" y="90" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">with category color</text>
+  <circle cx="280" cy="105" r="8" fill="#c41230"/>
+  <text x="280" y="109" font-size="8" text-anchor="middle" fill="white">🦊</text>
+
+  <!-- Arrow 2 -->
+  <path d="M 355 70 L 385 70" stroke="#117aca" stroke-width="2" fill="none"/>
+  <polygon points="385,65 395,70 385,75" fill="#117aca"/>
+
+  <!-- Step 3: Click -->
+  <rect x="400" y="30" width="140" height="80" fill="#f7f7f7" rx="4" stroke="#d4d4d4"/>
+  <text x="470" y="55" font-family="Arial, sans-serif" font-size="10" fill="#004b87" text-anchor="middle" font-weight="bold">3. CLICK</text>
+  <text x="470" y="75" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">Click fox for popup</text>
+  <text x="470" y="90" font-family="Arial, sans-serif" font-size="11" fill="#333333" text-anchor="middle">with quick analysis</text>
+
+  <!-- Arrow 3 -->
+  <path d="M 545 70 L 575 70" stroke="#117aca" stroke-width="2" fill="none"/>
+  <polygon points="575,65 585,70 575,75" fill="#117aca"/>
+
+  <!-- Step 4: Analyze -->
+  <rect x="590" y="30" width="90" height="80" fill="#004b87" rx="4"/>
+  <text x="635" y="55" font-family="Arial, sans-serif" font-size="10" fill="#7aacdc" text-anchor="middle" font-weight="bold">4. ANALYZE</text>
+  <text x="635" y="75" font-family="Arial, sans-serif" font-size="11" fill="white" text-anchor="middle">Claude AI</text>
+  <text x="635" y="90" font-family="Arial, sans-serif" font-size="11" fill="white" text-anchor="middle">enrichment</text>
+</svg>

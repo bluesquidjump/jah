@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120" viewBox="0 0 600 120">
+  <!-- Background -->
+  <rect width="600" height="120" fill="#ffffff" rx="4"/>
+  <rect x="1" y="1" width="598" height="118" fill="none" stroke="#d4d4d4" rx="4"/>
+
+  <!-- Title -->
+  <text x="300" y="25" font-family="Arial, sans-serif" font-size="12" fill="#004b87" text-anchor="middle" font-weight="bold" letter-spacing="1">CATEGORY COLOR CODING</text>
+
+  <!-- Row 1 -->
+  <!-- Malware -->
+  <circle cx="50" cy="60" r="12" fill="#c41230"/>
+  <text x="50" y="64" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="75" y="64" font-family="Arial, sans-serif" font-size="11" fill="#333333">Malware</text>
+
+  <!-- Suspicious -->
+  <circle cx="170" cy="60" r="12" fill="#b45309"/>
+  <text x="170" y="64" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="195" y="64" font-family="Arial, sans-serif" font-size="11" fill="#333333">Suspicious</text>
+
+  <!-- Bot -->
+  <circle cx="300" cy="60" r="12" fill="#b45309"/>
+  <text x="300" y="64" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="325" y="64" font-family="Arial, sans-serif" font-size="11" fill="#333333">Bot/Crawler</text>
+
+  <!-- Browser -->
+  <circle cx="430" cy="60" r="12" fill="#1a8754"/>
+  <text x="430" y="64" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="455" y="64" font-family="Arial, sans-serif" font-size="11" fill="#333333">Browser</text>
+
+  <!-- Tool -->
+  <circle cx="545" cy="60" r="12" fill="#004b87"/>
+  <text x="545" y="64" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="570" y="64" font-family="Arial, sans-serif" font-size="11" fill="#333333">Tool</text>
+
+  <!-- Row 2 -->
+  <!-- VPN -->
+  <circle cx="50" cy="100" r="12" fill="#117aca"/>
+  <text x="50" y="104" font-size="10" text-anchor="middle" fill="white">🦊</text>
+  <text x="75" y="104" font-family="Arial, sans-serif" font-size="11" fill="#333333">VPN</text>
+
+  <!-- Library -->
+  <circle cx="170" cy="100" r="12" fill="#7aacdc"/>
+  <text x="170" y="104" font-size="10" text-anchor="middle" fill="#004b87">🦊</text>
+  <text x="195" y="104" font-family="Arial, sans-serif" font-size="11" fill="#333333">Library</text>
+</svg>
