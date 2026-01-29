@@ -110,7 +110,22 @@ Select any JA4 fingerprint text, right-click, and choose "Enrich JA4 Hash" to an
 
 ## Installation
 
+### Signed Extension (Recommended)
+
+Download the latest signed `.xpi` from the [Releases](https://github.com/bluesquidjump/jah/releases) page, then:
+
+1. Open Firefox
+2. Go to `about:addons` (or menu → Add-ons and themes)
+3. Click the **gear icon** ⚙️ at the top
+4. Select **"Install Add-on From File..."**
+5. Choose the downloaded `.xpi` file
+6. Click **Add** when prompted
+
+The extension will be permanently installed and persist across browser restarts.
+
 ### From Source (Development)
+
+For development or testing the latest changes:
 
 1. Clone this repository:
    ```bash
@@ -124,6 +139,8 @@ Select any JA4 fingerprint text, right-click, and choose "Enrich JA4 Hash" to an
 4. Click "Load Temporary Add-on..."
 
 5. Navigate to the `jah` folder and select `manifest.json`
+
+> **Note:** Temporary add-ons are removed when Firefox closes. For permanent installation, use the signed extension above or [sign your own build](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/#signing-your-extension-for-self-distribution).
 
 ### Configuration
 
