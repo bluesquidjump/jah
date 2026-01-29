@@ -1,7 +1,7 @@
 # JAH — JA4 Hash Enrichment
 
 <p align="center">
-  <img src="icons/icon-96.png" alt="JAH Logo" width="96" height="96">
+  <img src="kitsune.png" alt="JAH Logo" width="150" height="150">
 </p>
 
 <p align="center">
