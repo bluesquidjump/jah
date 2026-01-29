@@ -1,35 +1,35 @@
-/* JAH Options Page Styles - JPMorgan Chase Inspired */
+/* JAH Options Page Styles */
 
 :root {
-  /* JPMorgan Chase Brand Colors */
-  --chase-blue: #117aca;
-  --chase-navy: #004b87;
-  --chase-deep-blue: #095fbb;
-  --chase-light-blue: #7aacdc;
-  --chase-pale-blue: #e9f3f8;
-  --chase-black: #000000;
-  --chase-dark-gray: #333333;
-  --chase-gray: #666666;
-  --chase-light-gray: #999999;
-  --chase-border: #d4d4d4;
-  --chase-bg-light: #f7f7f7;
-  --chase-white: #ffffff;
+  /* JAH Brand Colors */
+  --jah-blue: #117aca;
+  --jah-navy: #004b87;
+  --jah-deep-blue: #095fbb;
+  --jah-light-blue: #7aacdc;
+  --jah-pale-blue: #e9f3f8;
+  --jah-black: #000000;
+  --jah-dark-gray: #333333;
+  --jah-gray: #666666;
+  --jah-light-gray: #999999;
+  --jah-border: #d4d4d4;
+  --jah-bg-light: #f7f7f7;
+  --jah-white: #ffffff;
 
   /* Semantic Colors */
-  --bg-primary: var(--chase-white);
-  --bg-secondary: var(--chase-bg-light);
-  --bg-tertiary: var(--chase-pale-blue);
-  --bg-card: var(--chase-white);
-  --text-primary: var(--chase-black);
-  --text-secondary: var(--chase-dark-gray);
-  --text-muted: var(--chase-gray);
-  --accent-primary: var(--chase-blue);
-  --accent-secondary: var(--chase-navy);
+  --bg-primary: var(--jah-white);
+  --bg-secondary: var(--jah-bg-light);
+  --bg-tertiary: var(--jah-pale-blue);
+  --bg-card: var(--jah-white);
+  --text-primary: var(--jah-black);
+  --text-secondary: var(--jah-dark-gray);
+  --text-muted: var(--jah-gray);
+  --accent-primary: var(--jah-blue);
+  --accent-secondary: var(--jah-navy);
   --success: #1a8754;
   --warning: #b45309;
   --danger: #c41230;
-  --border-color: var(--chase-border);
-  --input-bg: var(--chase-white);
+  --border-color: var(--jah-border);
+  --input-bg: var(--jah-white);
 }
 
 * {
@@ -49,7 +49,7 @@ body {
 }
 
 a {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   text-decoration: none;
 }
 
@@ -68,14 +68,14 @@ a:hover {
   text-align: center;
   margin-bottom: 48px;
   padding-bottom: 32px;
-  border-bottom: 2px solid var(--chase-navy);
+  border-bottom: 2px solid var(--jah-navy);
 }
 
 .options-header h1 {
   font-family: 'Georgia', 'Times New Roman', serif;
   font-size: 36px;
   font-weight: 400;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   margin-bottom: 8px;
   letter-spacing: 2px;
 }
@@ -102,7 +102,7 @@ a:hover {
   font-size: 20px;
   font-weight: 400;
   margin-bottom: 20px;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -127,7 +127,7 @@ a:hover {
 
 .badge-future {
   background: var(--warning);
-  color: var(--chase-white);
+  color: var(--jah-white);
 }
 
 /* Form Elements */
@@ -160,7 +160,7 @@ a:hover {
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--chase-blue);
+  border-color: var(--jah-blue);
   box-shadow: 0 0 0 3px rgba(17, 122, 202, 0.1);
 }
 
@@ -214,7 +214,7 @@ a:hover {
 
 .status-pending {
   background: rgba(17, 122, 202, 0.1);
-  color: var(--chase-blue);
+  color: var(--jah-blue);
 }
 
 /* MCP Servers */
@@ -243,7 +243,7 @@ a:hover {
   font-weight: 600;
   margin-bottom: 4px;
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
 }
 
 .server-info p {
@@ -281,7 +281,7 @@ a:hover {
   font-size: 11px;
   padding: 4px 10px;
   border-radius: 2px;
-  background: var(--chase-bg-light);
+  background: var(--jah-bg-light);
   color: var(--text-muted);
   font-weight: 500;
   text-transform: uppercase;
@@ -347,14 +347,14 @@ a:hover {
   width: 20px;
   left: 3px;
   bottom: 3px;
-  background-color: var(--chase-white);
+  background-color: var(--jah-white);
   transition: 0.2s;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toggle input:checked + .slider {
-  background-color: var(--chase-blue);
+  background-color: var(--jah-blue);
 }
 
 .toggle input:checked + .slider:before {
@@ -412,7 +412,7 @@ a:hover {
   font-family: 'Georgia', 'Times New Roman', serif;
   font-size: 18px;
   font-weight: 400;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
 }
 
 .about-description {
@@ -479,28 +479,28 @@ a:hover {
 }
 
 .btn-primary {
-  background: var(--chase-blue);
-  color: var(--chase-white);
+  background: var(--jah-blue);
+  color: var(--jah-white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--chase-navy);
+  background: var(--jah-navy);
 }
 
 .btn-secondary {
-  background: var(--chase-white);
-  color: var(--chase-navy);
-  border: 2px solid var(--chase-navy);
+  background: var(--jah-white);
+  color: var(--jah-navy);
+  border: 2px solid var(--jah-navy);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--chase-navy);
-  color: var(--chase-white);
+  background: var(--jah-navy);
+  color: var(--jah-white);
 }
 
 .btn-danger {
   background: var(--danger);
-  color: var(--chase-white);
+  color: var(--jah-white);
 }
 
 .btn-danger:hover:not(:disabled) {
@@ -523,12 +523,12 @@ a:hover {
   justify-content: center;
   font-size: 18px;
   border-radius: 4px;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: var(--chase-pale-blue);
-  border-color: var(--chase-light-blue);
+  background: var(--jah-pale-blue);
+  border-color: var(--jah-light-blue);
 }
 
 /* Scrollbar */
@@ -541,18 +541,18 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--chase-light-blue);
+  background: var(--jah-light-blue);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--chase-blue);
+  background: var(--jah-blue);
 }
 
 /* Selection */
 ::selection {
-  background: var(--chase-pale-blue);
-  color: var(--chase-navy);
+  background: var(--jah-pale-blue);
+  color: var(--jah-navy);
 }
 
 /* Responsive */

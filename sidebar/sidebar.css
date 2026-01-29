@@ -1,34 +1,34 @@
-/* JAH Sidebar Styles - JPMorgan Chase Inspired */
+/* JAH Sidebar Styles */
 
 :root {
-  /* JPMorgan Chase Brand Colors */
-  --chase-blue: #117aca;
-  --chase-navy: #004b87;
-  --chase-deep-blue: #095fbb;
-  --chase-light-blue: #7aacdc;
-  --chase-pale-blue: #e9f3f8;
-  --chase-black: #000000;
-  --chase-dark-gray: #333333;
-  --chase-gray: #666666;
-  --chase-light-gray: #999999;
-  --chase-border: #d4d4d4;
-  --chase-bg-light: #f7f7f7;
-  --chase-white: #ffffff;
+  /* JAH Brand Colors */
+  --jah-blue: #117aca;
+  --jah-navy: #004b87;
+  --jah-deep-blue: #095fbb;
+  --jah-light-blue: #7aacdc;
+  --jah-pale-blue: #e9f3f8;
+  --jah-black: #000000;
+  --jah-dark-gray: #333333;
+  --jah-gray: #666666;
+  --jah-light-gray: #999999;
+  --jah-border: #d4d4d4;
+  --jah-bg-light: #f7f7f7;
+  --jah-white: #ffffff;
 
   /* Semantic Colors */
-  --bg-primary: var(--chase-white);
-  --bg-secondary: var(--chase-bg-light);
-  --bg-tertiary: var(--chase-pale-blue);
-  --text-primary: var(--chase-black);
-  --text-secondary: var(--chase-dark-gray);
-  --text-muted: var(--chase-gray);
-  --accent-primary: var(--chase-blue);
-  --accent-secondary: var(--chase-navy);
-  --accent-light: var(--chase-light-blue);
+  --bg-primary: var(--jah-white);
+  --bg-secondary: var(--jah-bg-light);
+  --bg-tertiary: var(--jah-pale-blue);
+  --text-primary: var(--jah-black);
+  --text-secondary: var(--jah-dark-gray);
+  --text-muted: var(--jah-gray);
+  --accent-primary: var(--jah-blue);
+  --accent-secondary: var(--jah-navy);
+  --accent-light: var(--jah-light-blue);
   --success: #1a8754;
   --warning: #b45309;
   --danger: #c41230;
-  --border-color: var(--chase-border);
+  --border-color: var(--jah-border);
   --code-bg: #f0f4f8;
 }
 
@@ -72,7 +72,7 @@ label,
 .sidebar-header {
   text-align: center;
   padding-bottom: 20px;
-  border-bottom: 2px solid var(--chase-navy);
+  border-bottom: 2px solid var(--jah-navy);
   margin-bottom: 24px;
 }
 
@@ -80,7 +80,7 @@ label,
   font-family: 'Georgia', 'Times New Roman', serif;
   font-size: 28px;
   font-weight: 400;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   margin: 0;
   letter-spacing: 3px;
 }
@@ -150,13 +150,13 @@ label,
 
 .empty-state code {
   display: block;
-  background: var(--chase-white);
+  background: var(--jah-white);
   padding: 12px;
   border-radius: 4px;
   font-size: 11px;
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   word-break: break-all;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   border: 1px solid var(--border-color);
 }
 
@@ -169,8 +169,8 @@ label,
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid var(--chase-pale-blue);
-  border-top-color: var(--chase-blue);
+  border: 3px solid var(--jah-pale-blue);
+  border-top-color: var(--jah-blue);
   border-radius: 50%;
   margin: 0 auto 24px;
   animation: spin 1s linear infinite;
@@ -230,18 +230,18 @@ label,
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--chase-white);
+  background: var(--jah-white);
   border: 2px solid var(--border-color);
 }
 
 .loading-step.active {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   font-weight: 500;
 }
 
 .loading-step.active::before {
-  border-color: var(--chase-blue);
-  background: var(--chase-blue);
+  border-color: var(--jah-blue);
+  background: var(--jah-blue);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -302,8 +302,8 @@ label,
 }
 
 .fingerprint-type {
-  background: var(--chase-navy);
-  color: var(--chase-white);
+  background: var(--jah-navy);
+  color: var(--jah-white);
   padding: 6px 16px;
   border-radius: 2px;
   font-size: 11px;
@@ -333,7 +333,7 @@ label,
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 12px;
   word-break: break-all;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
 }
 
 .copy-btn {
@@ -344,7 +344,7 @@ label,
   padding: 4px 8px;
   opacity: 0.6;
   transition: opacity 0.2s;
-  color: var(--chase-blue);
+  color: var(--jah-blue);
 }
 
 .copy-btn:hover {
@@ -353,7 +353,7 @@ label,
 
 /* Summary section */
 .summary-section {
-  background: var(--chase-navy);
+  background: var(--jah-navy);
   border-radius: 4px;
   padding: 24px;
   margin-bottom: 24px;
@@ -367,7 +367,7 @@ label,
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--chase-blue);
+  background: var(--jah-blue);
   border-radius: 4px 4px 0 0;
 }
 
@@ -381,14 +381,14 @@ label,
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 12px;
-  color: var(--chase-light-blue);
+  color: var(--jah-light-blue);
   font-weight: 600;
 }
 
 .summary-text {
   font-size: 15px;
   line-height: 1.7;
-  color: var(--chase-white);
+  color: var(--jah-white);
   margin: 0;
 }
 
@@ -420,7 +420,7 @@ label,
 }
 
 .external-link {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   text-decoration: none;
   font-size: 12px;
   font-weight: 400;
@@ -441,7 +441,7 @@ label,
   align-items: center;
   gap: 8px;
   background: var(--success);
-  color: var(--chase-white);
+  color: var(--jah-white);
   padding: 8px 14px;
   border-radius: 2px;
   margin-bottom: 16px;
@@ -502,7 +502,7 @@ label,
 .ja4db-useragents code {
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 10px;
-  background: var(--chase-white);
+  background: var(--jah-white);
   padding: 8px 12px;
   border-radius: 4px;
   display: block;
@@ -518,7 +518,7 @@ label,
   padding: 20px;
   margin-bottom: 24px;
   border: 1px solid var(--border-color);
-  border-left: 4px solid var(--chase-blue);
+  border-left: 4px solid var(--jah-blue);
 }
 
 .mcp-section.hidden {
@@ -551,7 +551,7 @@ label,
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   margin-bottom: 8px;
 }
 
@@ -579,7 +579,7 @@ label,
 }
 
 .search-results a {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -631,8 +631,8 @@ label,
 }
 
 .match-badge.category-browser { border-left-color: var(--success); }
-.match-badge.category-tool { border-left-color: var(--chase-blue); }
-.match-badge.category-library { border-left-color: var(--chase-light-blue); }
+.match-badge.category-tool { border-left-color: var(--jah-blue); }
+.match-badge.category-library { border-left-color: var(--jah-light-blue); }
 .match-badge.category-bot { border-left-color: var(--warning); }
 .match-badge.category-suspicious { border-left-color: var(--danger); }
 .match-badge.category-malware { border-left-color: #8b0000; }
@@ -686,17 +686,17 @@ label,
 
 .components-dl dd {
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   font-size: 13px;
 }
 
 .ssh-analysis {
   margin-top: 12px;
   padding: 12px 16px;
-  background: var(--chase-pale-blue);
+  background: var(--jah-pale-blue);
   border-radius: 4px;
   font-size: 13px;
-  border: 1px solid var(--chase-light-blue);
+  border: 1px solid var(--jah-light-blue);
 }
 
 /* Analysis section */
@@ -729,7 +729,7 @@ label,
   font-family: 'Georgia', 'Times New Roman', serif;
   margin-top: 20px;
   margin-bottom: 10px;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   font-weight: 400;
 }
 
@@ -757,17 +757,17 @@ label,
 }
 
 .analysis-content code {
-  background: var(--chase-white);
+  background: var(--jah-white);
   padding: 2px 8px;
   border-radius: 3px;
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 12px;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   border: 1px solid var(--border-color);
 }
 
 .analysis-content pre {
-  background: var(--chase-white);
+  background: var(--jah-white);
   padding: 16px;
   border-radius: 4px;
   overflow-x: auto;
@@ -782,7 +782,7 @@ label,
 }
 
 .analysis-content strong {
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   font-weight: 600;
 }
 
@@ -803,7 +803,7 @@ label,
 .history-section {
   margin-top: auto;
   padding-top: 24px;
-  border-top: 2px solid var(--chase-navy);
+  border-top: 2px solid var(--jah-navy);
 }
 
 .history-header {
@@ -817,13 +817,13 @@ label,
 .history-header h3 {
   font-size: 11px;
   font-weight: 600;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .toggle-icon {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   font-size: 12px;
 }
 
@@ -846,7 +846,7 @@ label,
 }
 
 .history-item:hover {
-  border-color: var(--chase-blue);
+  border-color: var(--jah-blue);
   box-shadow: 0 2px 8px rgba(17, 122, 202, 0.1);
 }
 
@@ -860,7 +860,7 @@ label,
 .history-type {
   font-size: 11px;
   font-weight: 600;
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -873,7 +873,7 @@ label,
 .history-hash {
   font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 11px;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
   word-break: break-all;
   display: block;
 }
@@ -882,7 +882,7 @@ label,
   display: inline-block;
   font-size: 10px;
   background: var(--success);
-  color: var(--chase-white);
+  color: var(--jah-white);
   padding: 3px 8px;
   border-radius: 2px;
   margin-top: 6px;
@@ -947,28 +947,28 @@ label,
 }
 
 .btn-primary {
-  background: var(--chase-blue);
-  color: var(--chase-white);
+  background: var(--jah-blue);
+  color: var(--jah-white);
 }
 
 .btn-primary:hover {
-  background: var(--chase-navy);
+  background: var(--jah-navy);
 }
 
 .btn-secondary {
-  background: var(--chase-white);
-  color: var(--chase-navy);
-  border: 2px solid var(--chase-navy);
+  background: var(--jah-white);
+  color: var(--jah-navy);
+  border: 2px solid var(--jah-navy);
 }
 
 .btn-secondary:hover {
-  background: var(--chase-navy);
-  color: var(--chase-white);
+  background: var(--jah-navy);
+  color: var(--jah-white);
 }
 
 .btn-danger {
   background: var(--danger);
-  color: var(--chase-white);
+  color: var(--jah-white);
 }
 
 .btn-danger:hover {
@@ -988,7 +988,7 @@ label,
   padding: 6px;
   opacity: 0.6;
   transition: opacity 0.2s;
-  color: var(--chase-navy);
+  color: var(--jah-navy);
 }
 
 .btn-icon:hover {
@@ -1005,23 +1005,23 @@ label,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--chase-light-blue);
+  background: var(--jah-light-blue);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--chase-blue);
+  background: var(--jah-blue);
 }
 
 /* Selection */
 ::selection {
-  background: var(--chase-pale-blue);
-  color: var(--chase-navy);
+  background: var(--jah-pale-blue);
+  color: var(--jah-navy);
 }
 
 /* Links */
 a {
-  color: var(--chase-blue);
+  color: var(--jah-blue);
   text-decoration: none;
 }
 
