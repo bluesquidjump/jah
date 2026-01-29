@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAH - JA4 Hash Enrichment</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div class="sidebar-container">
+    <header class="sidebar-header">
+      <h1>JAH</h1>
+      <span class="subtitle">JA4 Hash Enrichment</span>
+    </header>
+
+    <div id="content" class="content">
+      <!-- Initial state -->
+      <div id="initial-state" class="state-panel">
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>Select a JA4 fingerprint hash on any page, right-click, and choose "Enrich JA4 Hash" to analyze it.</p>
+          <div class="examples">
+            <p><strong>Example formats:</strong></p>
+            <code>t13d1516h2_8daaf6152771_b0da82dd1658</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading-state" class="state-panel hidden">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Analyzing fingerprint...</p>
+          <p class="hash-preview" id="loading-hash"></p>
+          <div class="loading-steps">
+            <div class="loading-step" id="step-parse">Parsing fingerprint...</div>
+            <div class="loading-step" id="step-ja4db">Querying JA4 Database...</div>
+            <div class="loading-step" id="step-analyze">AI Analysis...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-state" class="state-panel hidden">
+        <div class="error-message">
+          <div class="icon">⚠️</div>
+          <p id="error-text"></p>
+          <button id="retry-btn" class="btn btn-secondary">Retry</button>
+        </div>
+      </div>
+
+      <!-- Results state -->
+      <div id="results-state" class="state-panel hidden">
+        <div class="result-card">
+          <div class="result-header">
+            <span class="fingerprint-type" id="result-type">JA4</span>
+            <span class="timestamp" id="result-timestamp"></span>
+          </div>
+
+          <div class="hash-display">
+            <code id="result-hash"></code>
+            <button class="copy-btn" id="copy-hash" title="Copy hash">📋</button>
+          </div>
+
+          <!-- Summary Section - Top-line narrative -->
+          <div id="summary-section" class="summary-section">
+            <h3>Summary</h3>
+            <p id="summary-text" class="summary-text"></p>
+          </div>
+
+          <!-- JA4 Database Results -->
+          <div id="ja4db-section" class="ja4db-section hidden">
+            <h3>JA4 Database <a href="https://ja4db.com" target="_blank" class="external-link">↗</a></h3>
+            <div id="ja4db-content"></div>
+          </div>
+
+          <!-- Known Match -->
+          <div id="known-match" class="known-match hidden">
+            <div class="match-badge">
+              <span class="match-icon">✓</span>
+              <span id="known-match-name"></span>
+            </div>
+            <p id="known-match-description"></p>
+          </div>
+
+          <!-- Parsed Components -->
+          <div class="parsed-components" id="parsed-components">
+            <h3>Parsed Components</h3>
+            <div id="components-list"></div>
+          </div>
+
+          <!-- Full Analysis -->
+          <div class="analysis-section">
+            <h3>Detailed Analysis</h3>
+            <div id="analysis-content" class="analysis-content"></div>
+          </div>
+
+          <!-- MCP Context (if available) -->
+          <div id="mcp-section" class="mcp-section hidden">
+            <h3>Additional Intelligence</h3>
+            <div id="mcp-content"></div>
+          </div>
+
+          <div class="meta-info">
+            <span id="model-info"></span>
+            <span id="usage-info"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History section -->
+    <div class="history-section">
+      <div class="history-header" id="history-toggle">
+        <h3>Recent Lookups</h3>
+        <span class="toggle-icon" id="history-icon">▼</span>
+      </div>
+      <div id="history-content" class="history-content hidden">
+        <div id="history-list"></div>
+        <button id="clear-history" class="btn btn-small btn-danger">Clear History</button>
+      </div>
+    </div>
+
+    <footer class="sidebar-footer">
+      <button id="settings-btn" class="btn btn-icon" title="Settings">⚙️</button>
+      <span class="version">v1.0.0</span>
+    </footer>
+  </div>
+
+  <script src="../lib/ja4-parser.js"></script>
+  <script src="sidebar.js"></script>
+</body>
+</html>

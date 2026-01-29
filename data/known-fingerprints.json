@@ -1,0 +1,140 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-28",
+  "fingerprints": {
+    "t13d1517h2_8daaf6152771_b0da82dd1658": {
+      "name": "Chrome (Windows)",
+      "category": "browser",
+      "description": "Google Chrome browser on Windows 10/11",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "common"]
+    },
+    "t13d1517h2_8daaf6152771_e5627efa2ab1": {
+      "name": "Chrome (macOS)",
+      "category": "browser",
+      "description": "Google Chrome browser on macOS",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "common"]
+    },
+    "t13d1516h2_8daaf6152771_02713d6af862": {
+      "name": "Firefox",
+      "category": "browser",
+      "description": "Mozilla Firefox browser",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "common"]
+    },
+    "t13d1515h2_8daaf6152771_b1ff8ab2d16f": {
+      "name": "Safari",
+      "category": "browser",
+      "description": "Apple Safari browser",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "apple"]
+    },
+    "t13d1516h2_8daaf6152771_4e59edc1297a": {
+      "name": "Edge",
+      "category": "browser",
+      "description": "Microsoft Edge browser (Chromium-based)",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "common"]
+    },
+    "t12d5909h1_e8f1e7e78f70_9aade0eb1cf0": {
+      "name": "curl",
+      "category": "tool",
+      "description": "curl command-line HTTP client",
+      "confidence": "high",
+      "tags": ["legitimate", "cli-tool", "common"]
+    },
+    "t12d1909h1_e8f1e7e78f70_9aade0eb1cf0": {
+      "name": "wget",
+      "category": "tool",
+      "description": "wget command-line downloader",
+      "confidence": "high",
+      "tags": ["legitimate", "cli-tool", "common"]
+    },
+    "t13d1909h2_8f8f1e7e78f7_3b5074ec1xxx": {
+      "name": "Python Requests",
+      "category": "library",
+      "description": "Python requests library",
+      "confidence": "medium",
+      "tags": ["legitimate", "library", "common"],
+      "partialMatch": true
+    },
+    "t13d1310h2_8daaf6152771_5b3074ec1xxx": {
+      "name": "Go net/http",
+      "category": "library",
+      "description": "Go standard library HTTP client",
+      "confidence": "medium",
+      "tags": ["legitimate", "library"],
+      "partialMatch": true
+    },
+    "t13d1111h2_xxxxxxxxxxxx_xxxxxxxxxxxx": {
+      "name": "Node.js",
+      "category": "library",
+      "description": "Node.js HTTP client",
+      "confidence": "low",
+      "tags": ["legitimate", "library"],
+      "partialMatch": true
+    },
+    "t12d0909h1_e8f1e7e78f70_0000000000": {
+      "name": "Googlebot",
+      "category": "bot",
+      "description": "Google's web crawler",
+      "confidence": "medium",
+      "tags": ["legitimate", "bot", "search-engine"]
+    },
+    "t12d0909h1_e8f1e7e78f70_0000000001": {
+      "name": "Bingbot",
+      "category": "bot",
+      "description": "Microsoft Bing's web crawler",
+      "confidence": "medium",
+      "tags": ["legitimate", "bot", "search-engine"]
+    },
+    "t10d0000h1_000000000000_000000000000": {
+      "name": "Suspicious TLS 1.0",
+      "category": "suspicious",
+      "description": "Client using deprecated TLS 1.0 - may indicate old software or attack tool",
+      "confidence": "high",
+      "tags": ["suspicious", "outdated", "security-concern"]
+    },
+    "q13d1517h3_8daaf6152771_b0da82dd1658": {
+      "name": "Chrome (QUIC/HTTP3)",
+      "category": "browser",
+      "description": "Google Chrome using QUIC protocol",
+      "confidence": "high",
+      "tags": ["legitimate", "browser", "http3"]
+    }
+  },
+  "categories": {
+    "browser": {
+      "name": "Web Browser",
+      "description": "Standard web browser clients",
+      "riskLevel": "low"
+    },
+    "tool": {
+      "name": "CLI Tool",
+      "description": "Command-line HTTP tools",
+      "riskLevel": "low"
+    },
+    "library": {
+      "name": "Programming Library",
+      "description": "HTTP client libraries",
+      "riskLevel": "low"
+    },
+    "bot": {
+      "name": "Bot/Crawler",
+      "description": "Automated web crawlers",
+      "riskLevel": "medium"
+    },
+    "suspicious": {
+      "name": "Suspicious",
+      "description": "Potentially malicious or concerning fingerprints",
+      "riskLevel": "high"
+    },
+    "malware": {
+      "name": "Known Malware",
+      "description": "Fingerprints associated with known malware",
+      "riskLevel": "critical"
+    }
+  },
+  "notes": "This is a sample database. For production use, consider integrating with ja4db.com or similar fingerprint databases."
+}

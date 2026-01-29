@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAH Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #1a1a2e; }
+    h2 { color: #374151; margin-top: 30px; }
+    .fingerprint-box {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: monospace;
+    }
+    .section { margin-bottom: 40px; }
+    code {
+      background: #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .warning {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .success {
+      background: #d1fae5;
+      border: 1px solid #10b981;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .info {
+      background: #dbeafe;
+      border: 1px solid #3b82f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>JAH Extension Test Page</h1>
+  <p>This page contains <strong>real JA4 fingerprints from the JA4DB database</strong> for testing the JAH extension.</p>
+
+  <div class="success">
+    <strong>These fingerprints SHOULD show fox icons</strong> because they exist in the JA4DB database!
+  </div>
+
+  <div class="info">
+    <strong>Note:</strong> If fingerprints are wrapped in a <code>&lt;span class="jah-fingerprint"&gt;</code>
+    but no fox icon appears, check the browser console (F12) for errors. You may need to configure
+    a Claude API key in the extension options for AI-powered analysis.
+  </div>
+
+  <div class="section">
+    <h2>1. JA4 - Real Browser Fingerprints (from JA4DB)</h2>
+
+    <div class="fingerprint-box">
+      <strong>Chrome/Chromium Browser (verified in JA4DB):</strong><br>
+      t13d1517h2_8daaf6152771_b0da82dd1658
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Chromium Browser (verified in JA4DB):</strong><br>
+      t13d1516h2_8daaf6152771_02713d6af862
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Chromium Browser QUIC (verified in JA4DB):</strong><br>
+      q13d0312h3_55b375c5d22e_06cda9e17597
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Python Library (verified in JA4DB):</strong><br>
+      t13i181000_85036bcba153_d41ae481755e
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>2. JA4H - Real HTTP Fingerprints (from JA4DB)</h2>
+
+    <div class="fingerprint-box">
+      <strong>Chrome HTTP fingerprint (verified in JA4DB):</strong><br>
+      ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726c
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Chrome HTTP fingerprint variant:</strong><br>
+      ge11cn22enus_e30875593364_ac95b44401d9_bf268205d743
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>3. Multiple Fingerprints Test</h2>
+    <p>This paragraph contains multiple real fingerprints inline:
+    The client used t13d1517h2_8daaf6152771_b0da82dd1658 to connect,
+    and we also observed t13d1516h2_8daaf6152771_02713d6af862 in the traffic logs.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Fingerprints NOT in JA4DB (No fox expected)</h2>
+    <div class="warning">
+      These are made-up fingerprints that do NOT exist in JA4DB.
+      Fox icons should NOT appear unless Claude AI makes a confident assessment.
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Made-up JA4 (NOT in database):</strong><br>
+      t13d1516h2_8daaf6152771_b0da82dd1658
+    </div>
+
+    <div class="fingerprint-box">
+      <strong>Made-up JA4S (NOT in database):</strong><br>
+      t130200_1301_234ea6891581
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>5. JA4SSH Fingerprints</h2>
+    <p>Note: SSH fingerprints are less common in JA4DB:</p>
+
+    <div class="fingerprint-box">
+      <strong>SSH fingerprint format:</strong><br>
+      c76s56p21_i76o21
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>6. Dynamic Content Test</h2>
+    <p>Click the button to add a real fingerprint dynamically:</p>
+    <button onclick="addDynamicFingerprint()">Add Real JA4DB Fingerprint</button>
+    <div id="dynamic-container"></div>
+
+    <script>
+      function addDynamicFingerprint() {
+        const container = document.getElementById('dynamic-container');
+        const div = document.createElement('div');
+        div.className = 'fingerprint-box';
+        div.textContent = 'Dynamically added (real from JA4DB): t13d1517h2_8daaf6152771_b0da82dd1658';
+        container.appendChild(div);
+      }
+    </script>
+  </div>
+
+  <hr>
+  <p><em>Test page for JAH Firefox Extension v1.0.1</em></p>
+  <p><small>Fingerprints sourced from <a href="https://ja4db.com" target="_blank">ja4db.com</a></small></p>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{
+  "manifest_version": 2,
+  "name": "JAH - JA4 Hash Enrichment",
+  "version": "1.1.0",
+  "description": "Enrich JA4 fingerprint hashes with intelligent analysis using Claude AI",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "jah@fingerprint-enrichment",
+      "strict_min_version": "78.0"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "activeTab",
+    "https://ja4db.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.search.brave.com/*",
+    "https://www.virustotal.com/*",
+    "https://api.shodan.io/*"
+  ],
+  "background": {
+    "scripts": [
+      "lib/ja4-parser.js",
+      "lib/ja4db-client.js",
+      "lib/mcp-client.js",
+      "lib/claude-api.js",
+      "background/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": ["icons/ja4-fox-flag.png"],
+  "sidebar_action": {
+    "default_title": "JAH - JA4 Enrichment",
+    "default_panel": "sidebar/sidebar.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  }
+}
