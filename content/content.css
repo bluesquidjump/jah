@@ -60,20 +60,21 @@
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #1a1a2e;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
+  background: #004b87;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 4px;
   font-size: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   white-space: nowrap;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   z-index: 999999;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 75, 135, 0.3);
   transition: opacity 0.2s ease, visibility 0.2s ease;
   pointer-events: none;
+  border: 1px solid #117aca;
 }
 
 .jah-tooltip::after {
@@ -83,7 +84,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: #1a1a2e;
+  border-top-color: #004b87;
 }
 
 .jah-flag:hover .jah-tooltip {
@@ -94,52 +95,57 @@
 /* Tooltip hint for clicking */
 .jah-tooltip-hint {
   font-size: 10px;
-  opacity: 0.7;
-  margin-top: 4px;
-  font-style: italic;
+  opacity: 0.8;
+  margin-top: 6px;
+  color: #7aacdc;
+  letter-spacing: 0.5px;
 }
 
 /* Category-specific styling */
 .jah-category-malware .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #ef4444);
+  filter: drop-shadow(0 0 6px #c41230);
 }
 
 .jah-category-malware .jah-tooltip {
-  background: #7f1d1d;
-  border: 1px solid #ef4444;
+  background: #c41230;
+  border: 1px solid #8b0000;
 }
 
 .jah-category-malware .jah-tooltip::after {
-  border-top-color: #7f1d1d;
+  border-top-color: #c41230;
 }
 
 .jah-category-vpn .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #3b82f6);
+  filter: drop-shadow(0 0 6px #117aca);
 }
 
 .jah-category-browser .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #22c55e);
+  filter: drop-shadow(0 0 6px #1a8754);
 }
 
 .jah-category-tool .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #a855f7);
+  filter: drop-shadow(0 0 6px #004b87);
 }
 
 .jah-category-bot .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #f59e0b);
+  filter: drop-shadow(0 0 6px #b45309);
+}
+
+.jah-category-library .jah-fox-icon {
+  filter: drop-shadow(0 0 6px #7aacdc);
 }
 
 .jah-category-suspicious .jah-fox-icon {
-  filter: drop-shadow(0 0 4px #f97316);
+  filter: drop-shadow(0 0 6px #b45309);
 }
 
 .jah-category-suspicious .jah-tooltip {
-  background: #7c2d12;
-  border: 1px solid #f97316;
+  background: #b45309;
+  border: 1px solid #92400e;
 }
 
 .jah-category-suspicious .jah-tooltip::after {
-  border-top-color: #7c2d12;
+  border-top-color: #b45309;
 }
 
 /* Responsive adjustments */
@@ -151,37 +157,60 @@
 }
 
 /* ============================================
-   Inline Panel Styles
+   Inline Panel Styles - JPMorgan Chase Inspired
    ============================================ */
 
 .jah-inline-panel {
+  --chase-blue: #117aca;
+  --chase-navy: #004b87;
+  --chase-light-blue: #7aacdc;
+  --chase-pale-blue: #e9f3f8;
+  --chase-white: #ffffff;
+  --chase-bg-light: #f7f7f7;
+  --chase-border: #d4d4d4;
+  --chase-text: #333333;
+  --chase-text-muted: #666666;
+  --chase-danger: #c41230;
+  --chase-success: #1a8754;
+  --chase-warning: #b45309;
+
   position: absolute;
   z-index: 999999;
-  background: #1a1a2e;
-  color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--chase-white);
+  color: var(--chase-text);
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 75, 135, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
-  min-width: 280px;
-  max-width: 400px;
+  min-width: 300px;
+  max-width: 420px;
   overflow: hidden;
+  border: 1px solid var(--chase-border);
 }
 
 .jah-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  background: #252545;
-  border-bottom: 1px solid #3a3a5a;
+  padding: 14px 18px;
+  background: var(--chase-navy);
+  color: var(--chase-white);
+  border-bottom: 3px solid var(--chase-blue);
+}
+
+.jah-panel-header strong {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 1px;
 }
 
 .jah-panel-close {
   cursor: pointer;
-  font-size: 18px;
-  opacity: 0.7;
+  font-size: 20px;
+  opacity: 0.8;
   transition: opacity 0.2s;
+  color: var(--chase-white);
 }
 
 .jah-panel-close:hover {
@@ -189,115 +218,147 @@
 }
 
 .jah-panel-hash {
-  padding: 8px 14px;
-  font-family: "SF Mono", Monaco, Consolas, monospace;
+  padding: 12px 18px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 11px;
-  background: #0d0d1a;
-  color: #8888aa;
+  background: var(--chase-bg-light);
+  color: var(--chase-navy);
   word-break: break-all;
+  border-bottom: 1px solid var(--chase-border);
 }
 
 .jah-panel-type {
   display: inline-block;
-  margin: 8px 14px;
-  padding: 2px 8px;
-  background: #004b87;
-  border-radius: 4px;
+  margin: 12px 18px 0 18px;
+  padding: 4px 12px;
+  background: var(--chase-navy);
+  color: var(--chase-white);
+  border-radius: 2px;
   font-size: 10px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .jah-panel-content {
-  padding: 12px 14px;
+  padding: 16px 18px;
 }
 
 .jah-panel-loading {
-  color: #8888aa;
+  color: var(--chase-text-muted);
   font-style: italic;
+  text-align: center;
+  padding: 12px 0;
 }
 
 .jah-panel-error {
-  color: #ef4444;
+  color: var(--chase-danger);
+  background: #fef2f2;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--chase-danger);
 }
 
 .jah-panel-section {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--chase-border);
 }
 
 .jah-panel-section:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .jah-panel-label {
   font-size: 10px;
   text-transform: uppercase;
-  color: #8888aa;
-  margin-bottom: 2px;
+  letter-spacing: 1px;
+  color: var(--chase-text-muted);
+  margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .jah-panel-value {
-  color: #fff;
+  color: var(--chase-text);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .jah-panel-desc {
-  font-size: 12px;
-  color: #aaaacc;
-  margin-top: 2px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 13px;
+  color: var(--chase-text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
 }
 
 .jah-panel-category {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .jah-panel-malware {
-  background: #7f1d1d;
-  color: #fecaca;
-  border: 1px solid #ef4444;
+  background: var(--chase-danger);
+  color: var(--chase-white);
 }
 
 .jah-panel-browser {
-  background: #14532d;
-  color: #bbf7d0;
+  background: var(--chase-success);
+  color: var(--chase-white);
 }
 
 .jah-panel-vpn {
-  background: #1e3a5f;
-  color: #bfdbfe;
+  background: var(--chase-blue);
+  color: var(--chase-white);
 }
 
 .jah-panel-tool {
-  background: #4c1d95;
-  color: #e9d5ff;
+  background: var(--chase-navy);
+  color: var(--chase-white);
 }
 
 .jah-panel-bot {
-  background: #78350f;
-  color: #fde68a;
+  background: var(--chase-warning);
+  color: var(--chase-white);
 }
 
 .jah-panel-suspicious {
-  background: #7c2d12;
-  color: #fed7aa;
-  border: 1px solid #f97316;
+  background: #dc6b00;
+  color: var(--chase-white);
+}
+
+.jah-panel-library {
+  background: var(--chase-light-blue);
+  color: var(--chase-navy);
 }
 
 .jah-panel-footer {
-  padding: 10px 14px;
-  border-top: 1px solid #3a3a5a;
-  background: #252545;
+  padding: 14px 18px;
+  border-top: 1px solid var(--chase-border);
+  background: var(--chase-bg-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.jah-panel-sidebar-link {
-  color: #60a5fa;
-  cursor: pointer;
+.jah-panel-footer-icon {
+  font-size: 14px;
+}
+
+.jah-panel-sidebar-hint {
+  color: var(--chase-text-muted);
   font-size: 12px;
+  line-height: 1.4;
 }
 
-.jah-panel-sidebar-link:hover {
-  text-decoration: underline;
+.jah-panel-sidebar-hint strong {
+  color: var(--chase-navy);
 }

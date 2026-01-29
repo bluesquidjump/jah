@@ -393,20 +393,21 @@
       </div>`;
     }
 
-    // Sidebar link
+    // Sidebar hint
     html += `<div class="jah-panel-footer">
-      <span class="jah-panel-sidebar-link">Open sidebar for full details</span>
+      <span class="jah-panel-footer-icon">📋</span>
+      <span class="jah-panel-sidebar-hint">
+        <strong>Full details:</strong> Open JAH sidebar via View → Sidebar → JAH
+      </span>
     </div>`;
 
     container.innerHTML = html;
 
-    // Sidebar link handler - store request for when user opens sidebar
-    container.querySelector('.jah-panel-sidebar-link')?.addEventListener('click', () => {
-      browser.runtime.sendMessage({
-        type: 'open-sidebar-enrich',
-        hash: hash
-      });
-    });
+    // Store pending enrichment so sidebar picks it up when opened
+    browser.runtime.sendMessage({
+      type: 'open-sidebar-enrich',
+      hash: hash
+    }).catch(() => {});
   }
 
   /**
