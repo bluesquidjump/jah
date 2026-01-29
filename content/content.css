@@ -129,10 +129,175 @@
   filter: drop-shadow(0 0 4px #f59e0b);
 }
 
+.jah-category-suspicious .jah-fox-icon {
+  filter: drop-shadow(0 0 4px #f97316);
+}
+
+.jah-category-suspicious .jah-tooltip {
+  background: #7c2d12;
+  border: 1px solid #f97316;
+}
+
+.jah-category-suspicious .jah-tooltip::after {
+  border-top-color: #7c2d12;
+}
+
 /* Responsive adjustments */
 @media (max-width: 500px) {
   .jah-tooltip {
     max-width: 200px;
     white-space: normal;
   }
+}
+
+/* ============================================
+   Inline Panel Styles
+   ============================================ */
+
+.jah-inline-panel {
+  position: absolute;
+  z-index: 999999;
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  min-width: 280px;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.jah-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #252545;
+  border-bottom: 1px solid #3a3a5a;
+}
+
+.jah-panel-close {
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.jah-panel-close:hover {
+  opacity: 1;
+}
+
+.jah-panel-hash {
+  padding: 8px 14px;
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  font-size: 11px;
+  background: #0d0d1a;
+  color: #8888aa;
+  word-break: break-all;
+}
+
+.jah-panel-type {
+  display: inline-block;
+  margin: 8px 14px;
+  padding: 2px 8px;
+  background: #004b87;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.jah-panel-content {
+  padding: 12px 14px;
+}
+
+.jah-panel-loading {
+  color: #8888aa;
+  font-style: italic;
+}
+
+.jah-panel-error {
+  color: #ef4444;
+}
+
+.jah-panel-section {
+  margin-bottom: 12px;
+}
+
+.jah-panel-section:last-child {
+  margin-bottom: 0;
+}
+
+.jah-panel-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #8888aa;
+  margin-bottom: 2px;
+}
+
+.jah-panel-value {
+  color: #fff;
+}
+
+.jah-panel-desc {
+  font-size: 12px;
+  color: #aaaacc;
+  margin-top: 2px;
+}
+
+.jah-panel-category {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.jah-panel-malware {
+  background: #7f1d1d;
+  color: #fecaca;
+  border: 1px solid #ef4444;
+}
+
+.jah-panel-browser {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.jah-panel-vpn {
+  background: #1e3a5f;
+  color: #bfdbfe;
+}
+
+.jah-panel-tool {
+  background: #4c1d95;
+  color: #e9d5ff;
+}
+
+.jah-panel-bot {
+  background: #78350f;
+  color: #fde68a;
+}
+
+.jah-panel-suspicious {
+  background: #7c2d12;
+  color: #fed7aa;
+  border: 1px solid #f97316;
+}
+
+.jah-panel-footer {
+  padding: 10px 14px;
+  border-top: 1px solid #3a3a5a;
+  background: #252545;
+}
+
+.jah-panel-sidebar-link {
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.jah-panel-sidebar-link:hover {
+  text-decoration: underline;
 }

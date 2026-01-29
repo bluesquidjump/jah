@@ -56,7 +56,7 @@
    * Validate category is one of allowed values
    */
   function validateCategory(category) {
-    const allowed = ['browser', 'vpn', 'malware', 'tool', 'library', 'bot', 'unknown'];
+    const allowed = ['browser', 'vpn', 'malware', 'tool', 'library', 'bot', 'suspicious', 'unknown'];
     return allowed.includes(category) ? category : 'unknown';
   }
 
@@ -138,6 +138,50 @@
     return results;
   }
 
+  // Known malware/suspicious application patterns
+  const MALWARE_PATTERNS = [
+    /sliver/i, /cobalt\s*strike/i, /metasploit/i, /meterpreter/i,
+    /empire/i, /covenant/i, /brute\s*ratel/i, /havoc/i, /mythic/i,
+    /pupy/i, /quasar/i, /njrat/i, /asyncrat/i, /remcos/i,
+    /agent\s*tesla/i, /lokibot/i, /emotet/i, /trickbot/i,
+    /qakbot/i, /icedid/i, /dridex/i, /ursnif/i, /zloader/i
+  ];
+
+  /**
+   * Check if application name matches known malware
+   */
+  function isMalwareApplication(appName) {
+    if (!appName) return false;
+    return MALWARE_PATTERNS.some(pattern => pattern.test(appName));
+  }
+
+  /**
+   * Determine category from result data
+   */
+  function determineCategory(result) {
+    // Check analysis first (from Claude)
+    if (result.analysis && result.analysis.category) {
+      return validateCategory(result.analysis.category);
+    }
+
+    // Check known match from local database
+    if (result.knownMatch && result.knownMatch.category) {
+      return validateCategory(result.knownMatch.category);
+    }
+
+    // Check JA4DB applications for malware patterns
+    if (result.ja4db && result.ja4db.found) {
+      const apps = result.ja4db.summary?.applications || [];
+      for (const app of apps) {
+        if (isMalwareApplication(app)) {
+          return 'malware';
+        }
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Create the fox flag element
    */
@@ -157,16 +201,27 @@
     const tooltip = document.createElement('span');
     tooltip.className = 'jah-tooltip';
 
+    // Determine category for styling
+    const category = determineCategory(result);
+    if (category) {
+      flag.classList.add(`jah-category-${category}`);
+    }
+
     if (result.analysis && result.analysis.confident) {
       tooltip.textContent = result.analysis.description ||
         `${result.analysis.application || 'Unknown'} (${result.analysis.category || 'unknown'})`;
       flag.classList.add('jah-confident');
-      const category = validateCategory(result.analysis.category);
-      flag.classList.add(`jah-category-${category}`);
+    } else if (result.knownMatch) {
+      tooltip.textContent = result.knownMatch.description ||
+        `${result.knownMatch.name} (${result.knownMatch.category || 'unknown'})`;
     } else if (result.ja4db && result.ja4db.found) {
       const apps = result.ja4db.summary?.applications || [];
       if (apps.length > 0) {
         tooltip.textContent = `Likely: ${apps.slice(0, 2).join(' or ')}`;
+        // Add warning for malware
+        if (category === 'malware') {
+          tooltip.textContent = `⚠ ${apps[0]} (known malware)`;
+        }
       } else {
         tooltip.textContent = `Found in JA4DB (${result.ja4db.matchCount} matches)`;
       }
@@ -182,26 +237,175 @@
 
     flag.appendChild(tooltip);
 
-    // Click handler - open sidebar and trigger full enrichment
+    // Click handler - show inline panel (sidebar can't be opened from content script)
     flag.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      openSidebarAndEnrich(hash, type);
+      showInlinePanel(flag, hash, type, result);
     });
 
     return flag;
   }
 
+  // Track active inline panel
+  let activePanel = null;
+
   /**
-   * Open the JAH sidebar and trigger full enrichment
+   * Show inline enrichment panel when fox icon is clicked
    */
-  function openSidebarAndEnrich(hash, type) {
+  function showInlinePanel(flagElement, hash, type, cachedResult) {
+    // Remove any existing panel
+    if (activePanel) {
+      activePanel.remove();
+      activePanel = null;
+    }
+
+    // Create panel
+    const panel = document.createElement('div');
+    panel.className = 'jah-inline-panel';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'jah-panel-header';
+    header.innerHTML = `<strong>JA4 Analysis</strong><span class="jah-panel-close">&times;</span>`;
+    panel.appendChild(header);
+
+    // Hash display
+    const hashDiv = document.createElement('div');
+    hashDiv.className = 'jah-panel-hash';
+    hashDiv.textContent = hash;
+    panel.appendChild(hashDiv);
+
+    // Type badge
+    const typeBadge = document.createElement('span');
+    typeBadge.className = 'jah-panel-type';
+    typeBadge.textContent = type;
+    panel.appendChild(typeBadge);
+
+    // Content area
+    const content = document.createElement('div');
+    content.className = 'jah-panel-content';
+    content.innerHTML = '<div class="jah-panel-loading">Loading full analysis...</div>';
+    panel.appendChild(content);
+
+    // Position and add to DOM
+    document.body.appendChild(panel);
+    activePanel = panel;
+
+    // Position near the flag
+    const rect = flagElement.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    let left = rect.left + window.scrollX;
+    let top = rect.bottom + window.scrollY + 8;
+
+    // Adjust if off-screen
+    if (left + panelRect.width > window.innerWidth) {
+      left = window.innerWidth - panelRect.width - 20;
+    }
+    if (top + panelRect.height > window.innerHeight + window.scrollY) {
+      top = rect.top + window.scrollY - panelRect.height - 8;
+    }
+
+    panel.style.left = `${Math.max(10, left)}px`;
+    panel.style.top = `${top}px`;
+
+    // Close button handler
+    header.querySelector('.jah-panel-close').addEventListener('click', () => {
+      panel.remove();
+      activePanel = null;
+    });
+
+    // Close on click outside
+    setTimeout(() => {
+      document.addEventListener('click', function closePanel(e) {
+        if (!panel.contains(e.target) && !flagElement.contains(e.target)) {
+          panel.remove();
+          activePanel = null;
+          document.removeEventListener('click', closePanel);
+        }
+      });
+    }, 100);
+
+    // Display cached result immediately if available
+    if (cachedResult) {
+      displayPanelResult(content, cachedResult, hash);
+    }
+
+    // Request full enrichment from background
     browser.runtime.sendMessage({
-      type: 'open-sidebar-enrich',
+      type: 'enrich-hash',
       hash: hash,
       fingerprintType: type
+    }).then(result => {
+      if (result.success) {
+        displayPanelResult(content, result, hash);
+      } else {
+        content.innerHTML = `<div class="jah-panel-error">Error: ${escapeHtml(result.error || 'Unknown error')}</div>`;
+      }
     }).catch(error => {
-      console.error('JAH: Failed to open sidebar:', error);
+      content.innerHTML = `<div class="jah-panel-error">Error: ${escapeHtml(error.message)}</div>`;
+    });
+  }
+
+  /**
+   * Display enrichment result in panel
+   */
+  function displayPanelResult(container, result, hash) {
+    const category = determineCategory(result);
+    let html = '';
+
+    // Category indicator
+    if (category) {
+      const categoryClass = category === 'malware' ? 'jah-panel-malware' : `jah-panel-${category}`;
+      html += `<div class="jah-panel-category ${categoryClass}">${category.toUpperCase()}</div>`;
+    }
+
+    // Known match info
+    if (result.knownMatch) {
+      html += `<div class="jah-panel-section">
+        <div class="jah-panel-label">Identified As:</div>
+        <div class="jah-panel-value">${escapeHtml(result.knownMatch.name)}</div>
+        <div class="jah-panel-desc">${escapeHtml(result.knownMatch.description || '')}</div>
+      </div>`;
+    }
+
+    // JA4DB results
+    if (result.ja4dbResult?.found || result.ja4db?.found) {
+      const db = result.ja4dbResult || result.ja4db;
+      const apps = db.summary?.applications || [];
+      if (apps.length > 0) {
+        html += `<div class="jah-panel-section">
+          <div class="jah-panel-label">JA4DB Applications:</div>
+          <div class="jah-panel-value">${apps.map(a => escapeHtml(a)).join(', ')}</div>
+        </div>`;
+      }
+      html += `<div class="jah-panel-section">
+        <div class="jah-panel-label">Database:</div>
+        <div class="jah-panel-value">${db.matchCount || 0} matches, ${db.summary?.totalObservations || 0} observations</div>
+      </div>`;
+    }
+
+    // Claude analysis summary
+    if (result.summary) {
+      html += `<div class="jah-panel-section">
+        <div class="jah-panel-label">Analysis:</div>
+        <div class="jah-panel-value">${escapeHtml(result.summary)}</div>
+      </div>`;
+    }
+
+    // Sidebar link
+    html += `<div class="jah-panel-footer">
+      <span class="jah-panel-sidebar-link">Open sidebar for full details</span>
+    </div>`;
+
+    container.innerHTML = html;
+
+    // Sidebar link handler - store request for when user opens sidebar
+    container.querySelector('.jah-panel-sidebar-link')?.addEventListener('click', () => {
+      browser.runtime.sendMessage({
+        type: 'open-sidebar-enrich',
+        hash: hash
+      });
     });
   }
 
