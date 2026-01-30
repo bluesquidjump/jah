@@ -56,7 +56,7 @@
    * Validate category is one of allowed values
    */
   function validateCategory(category) {
-    const allowed = ['browser', 'vpn', 'malware', 'tool', 'library', 'bot', 'suspicious', 'unknown'];
+    const allowed = ['browser', 'vpn', 'malware', 'tool', 'library', 'bot', 'suspicious', 'benign', 'unknown'];
     return allowed.includes(category) ? category : 'unknown';
   }
 
@@ -157,24 +157,55 @@
 
   /**
    * Determine category from result data
+   * Priority: Claude assessment > local known match > JA4DB direct matches > JA4DB related matches
    */
   function determineCategory(result) {
-    // Check analysis first (from Claude)
-    if (result.analysis && result.analysis.category) {
-      return validateCategory(result.analysis.category);
+    // 1. Check Claude's structured assessment first (highest priority)
+    if (result.assessment && result.assessment.category) {
+      return validateCategory(result.assessment.category);
     }
 
-    // Check known match from local database
+    // 2. Check known match from local database
     if (result.knownMatch && result.knownMatch.category) {
       return validateCategory(result.knownMatch.category);
     }
 
-    // Check JA4DB applications for malware patterns
-    if (result.ja4db && result.ja4db.found) {
-      const apps = result.ja4db.summary?.applications || [];
-      for (const app of apps) {
+    // 3. Check JA4DB results with type-awareness
+    const ja4db = result.ja4dbResult || result.ja4db;
+    if (ja4db && ja4db.found) {
+      // First check DIRECT applications (associated with the queried fingerprint type)
+      const directApps = ja4db.summary?.directApplications || [];
+      for (const app of directApps) {
         if (isMalwareApplication(app)) {
           return 'malware';
+        }
+      }
+
+      // If no direct malware, check if direct apps suggest a benign category
+      if (directApps.length > 0) {
+        // Has direct applications but none are malware - likely legitimate
+        return null; // Let the UI show neutral/unknown rather than incorrectly flagging
+      }
+
+      // Only check related applications if there are no direct applications
+      // Related apps are associated with OTHER fingerprint types in the same record
+      // (e.g., queried JA4S but the malware is identified by JA4 in the same record)
+      const relatedApps = ja4db.summary?.relatedApplications || [];
+      if (relatedApps.length > 0 && directApps.length === 0) {
+        // Log for debugging - this is the case where we'd previously misattribute
+        console.log('JAH: Found related (not direct) applications:', relatedApps);
+        // Don't return malware category for related apps - the queried fingerprint
+        // itself isn't directly associated with malware
+      }
+
+      // Fallback: check all applications if no direct/related distinction available
+      // (for backward compatibility with cached results)
+      if (!ja4db.summary?.directApplications && !ja4db.summary?.relatedApplications) {
+        const allApps = ja4db.summary?.applications || [];
+        for (const app of allApps) {
+          if (isMalwareApplication(app)) {
+            return 'malware';
+          }
         }
       }
     }

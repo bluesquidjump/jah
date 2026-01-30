@@ -326,6 +326,7 @@ async function handleEnrichment(hash) {
     knownMatch: knownMatch?.name || null,
     ja4dbFound: ja4dbResult?.found || false,
     summary: result.summary || null,
+    assessment: result.assessment || null,
     timestamp: result.timestamp,
     analysis: result.analysis
   });
@@ -338,6 +339,7 @@ async function handleEnrichment(hash) {
     ja4dbResult,
     mcpContext,
     summary: result.summary,
+    assessment: result.assessment,
     analysis: result.analysis,
     model: result.model,
     usage: result.usage,

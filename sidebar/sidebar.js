@@ -86,9 +86,9 @@
   }
 
   /**
-   * Render the summary section
+   * Render the summary section with optional assessment badge
    */
-  function renderSummary(summary) {
+  function renderSummary(summary, assessment) {
     if (!summary) {
       elements.summarySection.classList.add('hidden');
       return;
@@ -96,6 +96,28 @@
 
     elements.summarySection.classList.remove('hidden');
     elements.summaryText.textContent = summary;
+
+    // Add assessment badge if available
+    const existingBadge = elements.summarySection.querySelector('.assessment-badge');
+    if (existingBadge) {
+      existingBadge.remove();
+    }
+
+    if (assessment) {
+      const badge = document.createElement('div');
+      badge.className = `assessment-badge threat-${assessment.threatLevel} confidence-${assessment.confidence}`;
+
+      // Map category to display-friendly name
+      const categoryDisplay = assessment.category === 'benign' ? 'Legitimate' :
+                             assessment.category.charAt(0).toUpperCase() + assessment.category.slice(1);
+
+      badge.innerHTML = `
+        <span class="assessment-category category-${assessment.category}">${escapeHtml(categoryDisplay)}</span>
+        <span class="assessment-threat">Threat: ${escapeHtml(assessment.threatLevel)}</span>
+        <span class="assessment-confidence">Confidence: ${escapeHtml(assessment.confidence)}</span>
+      `;
+      elements.summarySection.insertBefore(badge, elements.summaryText);
+    }
   }
 
   /**
@@ -118,8 +140,25 @@
       <span class="badge-label">record${ja4dbResult.matchCount !== 1 ? 's' : ''} found</span>
     </div>`;
 
-    // Applications
-    if (summary.applications.length > 0) {
+    // Direct Applications (associated with the queried fingerprint type)
+    if (summary.directApplications && summary.directApplications.length > 0) {
+      html += `<div class="ja4db-item">
+        <span class="ja4db-label">Applications:</span>
+        <span class="ja4db-value">${summary.directApplications.map(escapeHtml).join(', ')}</span>
+      </div>`;
+    }
+
+    // Related Applications (associated with other fingerprint types in the same record)
+    if (summary.relatedApplications && summary.relatedApplications.length > 0) {
+      html += `<div class="ja4db-item ja4db-related">
+        <span class="ja4db-label">Related (different fingerprint type):</span>
+        <span class="ja4db-value ja4db-related-value">${summary.relatedApplications.map(escapeHtml).join(', ')}</span>
+        <div class="ja4db-related-note">These applications are identified by a different fingerprint type in the same database record.</div>
+      </div>`;
+    }
+
+    // Fallback for older cached results without direct/related distinction
+    if (!summary.directApplications && !summary.relatedApplications && summary.applications && summary.applications.length > 0) {
       html += `<div class="ja4db-item">
         <span class="ja4db-label">Applications:</span>
         <span class="ja4db-value">${summary.applications.map(escapeHtml).join(', ')}</span>
@@ -321,9 +360,10 @@
       return;
     }
 
-    // Remove the summary section from the analysis since we display it separately
+    // Remove the summary section and ASSESSMENT line from the analysis since we display them separately
     let cleanedText = analysisText
       .replace(/^##?\s*Summary\s*\n+[\s\S]*?(?=\n##?\s|\n\*\*[A-Z])/im, '')
+      .replace(/\n*ASSESSMENT:\s*\w+\s*\|\s*\w+\s*\|\s*\w+\s*$/im, '')
       .trim();
 
     // SECURITY: Escape HTML first to prevent XSS, then apply markdown formatting
@@ -377,8 +417,8 @@
     elements.resultTimestamp.textContent = formatTimestamp(result.timestamp);
     elements.resultHash.textContent = result.hash;
 
-    // Render summary at the top
-    renderSummary(result.summary);
+    // Render summary at the top with assessment badge
+    renderSummary(result.summary, result.assessment);
 
     // Render JA4 Database results
     renderJA4DBResults(result.ja4dbResult);

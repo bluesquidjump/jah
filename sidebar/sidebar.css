@@ -1028,3 +1028,113 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* Assessment badge */
+.assessment-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.assessment-category {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 2px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.assessment-category.category-browser,
+.assessment-category.category-benign {
+  background: var(--success);
+  color: var(--jah-white);
+}
+
+.assessment-category.category-library {
+  background: var(--jah-light-blue);
+  color: var(--jah-navy);
+}
+
+.assessment-category.category-tool {
+  background: var(--jah-blue);
+  color: var(--jah-white);
+}
+
+.assessment-category.category-vpn {
+  background: #6366f1;
+  color: var(--jah-white);
+}
+
+.assessment-category.category-bot {
+  background: var(--warning);
+  color: var(--jah-white);
+}
+
+.assessment-category.category-suspicious {
+  background: #ea580c;
+  color: var(--jah-white);
+}
+
+.assessment-category.category-malware {
+  background: #991b1b;
+  color: var(--jah-white);
+}
+
+.assessment-threat,
+.assessment-confidence {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--jah-white);
+}
+
+.threat-critical .assessment-threat { background: #991b1b; }
+.threat-high .assessment-threat { background: var(--danger); }
+.threat-medium .assessment-threat { background: var(--warning); }
+.threat-low .assessment-threat { background: #0369a1; }
+.threat-none .assessment-threat { background: var(--success); }
+
+.confidence-high { opacity: 1; }
+.confidence-medium { opacity: 0.85; }
+.confidence-low { opacity: 0.7; }
+
+/* Related applications (different fingerprint type) */
+.ja4db-related {
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.ja4db-related .ja4db-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.ja4db-related-value {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ja4db-related-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-color);
+  line-height: 1.4;
+}

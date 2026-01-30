@@ -119,8 +119,20 @@
   filter: drop-shadow(0 0 6px #117aca);
 }
 
-.jah-category-browser .jah-fox-icon {
+.jah-category-browser .jah-fox-icon,
+.jah-category-benign .jah-fox-icon {
   filter: drop-shadow(0 0 6px #1a8754);
+}
+
+.jah-category-browser .jah-tooltip,
+.jah-category-benign .jah-tooltip {
+  background: #1a8754;
+  border: 1px solid #0d5a39;
+}
+
+.jah-category-browser .jah-tooltip::after,
+.jah-category-benign .jah-tooltip::after {
+  border-top-color: #1a8754;
 }
 
 .jah-category-tool .jah-fox-icon {
@@ -310,7 +322,8 @@
   color: var(--jah-white);
 }
 
-.jah-panel-browser {
+.jah-panel-browser,
+.jah-panel-benign {
   background: var(--jah-success);
   color: var(--jah-white);
 }
