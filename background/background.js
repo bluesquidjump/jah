@@ -6,6 +6,10 @@
 // Known fingerprints database (loaded on startup)
 let knownFingerprints = {};
 
+// Local JA4DB status
+let localDbReady = false;
+let localDbSyncing = false;
+
 // Cache for quick lookups (page scanning)
 const quickLookupCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -40,8 +44,63 @@ async function loadKnownFingerprints() {
   }
 }
 
+// Initialize local JA4DB
+async function initLocalJA4DB() {
+  try {
+    await JA4DBLocal.init();
+    localDbReady = true;
+    console.log('JAH: Local JA4DB initialized');
+
+    // Check if initial sync is needed
+    const needsSync = await JA4DBLocal.needsInitialSync();
+    if (needsSync) {
+      console.log('JAH: Initial sync required, starting download...');
+      syncLocalJA4DB();
+    } else {
+      const stats = await JA4DBLocal.getStats();
+      console.log(`JAH: Local JA4DB ready with ${stats.recordCount} records (last sync: ${stats.lastSync})`);
+    }
+  } catch (error) {
+    console.error('JAH: Failed to initialize local JA4DB:', error);
+    localDbReady = false;
+  }
+}
+
+// Sync local JA4DB
+async function syncLocalJA4DB(progressCallback = null) {
+  if (localDbSyncing) {
+    console.log('JAH: Sync already in progress');
+    return { success: false, error: 'Sync already in progress' };
+  }
+
+  localDbSyncing = true;
+  try {
+    const result = await JA4DBLocal.syncDatabase(progressCallback);
+    return result;
+  } finally {
+    localDbSyncing = false;
+  }
+}
+
+// Set up daily sync alarm
+function setupSyncAlarm() {
+  browser.alarms.create('ja4db-sync', {
+    periodInMinutes: 24 * 60 // Daily sync
+  });
+}
+
+// Handle alarms
+browser.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'ja4db-sync') {
+    console.log('JAH: Running scheduled JA4DB sync');
+    syncLocalJA4DB();
+  }
+});
+
 // Initialize on startup
 loadKnownFingerprints();
+initLocalJA4DB();
+setupSyncAlarm();
 
 // Clean up old cache entries periodically
 setInterval(() => {
@@ -150,9 +209,21 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'lookup-ja4db') {
-    JA4DBClient.lookup(message.hash, message.fingerType)
-      .then(result => sendResponse(result))
-      .catch(error => sendResponse({ found: false, error: error.message }));
+    (async () => {
+      try {
+        // Prefer local database for instant lookup
+        if (localDbReady) {
+          const result = await JA4DBLocal.lookup(message.hash, message.fingerType);
+          sendResponse(result);
+        } else {
+          // Fallback to remote API
+          const result = await JA4DBClient.lookup(message.hash, message.fingerType);
+          sendResponse(result);
+        }
+      } catch (error) {
+        sendResponse({ found: false, error: error.message });
+      }
+    })();
     return true;
   }
 
@@ -227,10 +298,51 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch(error => sendResponse({ error: error.message }));
     return true;
   }
+
+  // Get local JA4DB status
+  if (message.type === 'get-local-db-status') {
+    (async () => {
+      try {
+        const stats = await JA4DBLocal.getStats();
+        sendResponse({
+          ready: localDbReady,
+          syncing: localDbSyncing,
+          ...stats
+        });
+      } catch (error) {
+        sendResponse({
+          ready: localDbReady,
+          syncing: localDbSyncing,
+          error: error.message
+        });
+      }
+    })();
+    return true;
+  }
+
+  // Force sync local JA4DB
+  if (message.type === 'sync-local-db') {
+    (async () => {
+      const result = await syncLocalJA4DB((progress) => {
+        // Send progress updates to popup if it's open
+        try {
+          browser.runtime.sendMessage({
+            type: 'sync-progress',
+            ...progress
+          });
+        } catch (e) {
+          // Popup may be closed
+        }
+      });
+      sendResponse(result);
+    })();
+    return true;
+  }
 });
 
 /**
- * Handle quick lookup for page scanning (JA4DB only, no Claude)
+ * Handle quick lookup for page scanning (local JA4DB, no Claude)
+ * Uses local IndexedDB for instant lookups - no rate limiting needed
  */
 async function handleQuickLookup(hash, type) {
   const cacheKey = `${type}:${hash}`;
@@ -241,27 +353,30 @@ async function handleQuickLookup(hash, type) {
     return cached.result;
   }
 
-  // Check rate limit
-  if (!rateLimiter.canMakeRequest()) {
-    return {
-      hash,
-      type,
-      error: 'Rate limit exceeded',
-      rateLimited: true
-    };
-  }
-
   try {
-    rateLimiter.recordRequest();
-
     // Parse the fingerprint
     const parsed = JA4Parser.parse(hash);
 
     // Check local known fingerprints
     const knownMatch = findKnownFingerprint(hash);
 
-    // Query JA4DB only (no Claude for quick lookup)
-    const ja4dbResult = await JA4DBClient.lookup(hash, type);
+    // Use local JA4DB for instant lookup (no rate limiting needed)
+    let ja4dbResult;
+    if (localDbReady) {
+      ja4dbResult = await JA4DBLocal.lookup(hash, type);
+    } else {
+      // Fallback to remote if local not ready
+      if (!rateLimiter.canMakeRequest()) {
+        return {
+          hash,
+          type,
+          error: 'Rate limit exceeded',
+          rateLimited: true
+        };
+      }
+      rateLimiter.recordRequest();
+      ja4dbResult = await JA4DBClient.lookup(hash, type);
+    }
 
     const result = {
       hash,
@@ -303,12 +418,17 @@ async function handleEnrichment(hash) {
   // Check for known match in local database
   const knownMatch = findKnownFingerprint(hash);
 
-  // Query JA4 Database (ja4db.com)
+  // Query JA4 Database (prefer local, fallback to remote)
   let ja4dbResult = null;
   try {
-    console.log('JAH: Querying JA4 Database for', hash);
-    ja4dbResult = await JA4DBClient.lookup(hash, parsed.type);
-    console.log('JAH: JA4DB result:', ja4dbResult.found ? 'found' : 'not found');
+    if (localDbReady) {
+      console.log('JAH: Querying local JA4 Database for', hash);
+      ja4dbResult = await JA4DBLocal.lookup(hash, parsed.type);
+    } else {
+      console.log('JAH: Querying remote JA4 Database for', hash);
+      ja4dbResult = await JA4DBClient.lookup(hash, parsed.type);
+    }
+    console.log('JAH: JA4DB result:', ja4dbResult.found ? 'found' : 'not found', `(${ja4dbResult.source || 'remote'})`);
   } catch (error) {
     console.warn('JAH: JA4DB lookup failed:', error.message);
   }

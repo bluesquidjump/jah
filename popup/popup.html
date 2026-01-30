@@ -35,8 +35,33 @@
       </div>
     </div>
 
+    <div class="popup-db-section" id="db-section">
+      <div class="db-header">
+        <span class="db-title">Local JA4DB</span>
+        <button id="sync-btn" class="sync-btn" title="Sync Database">
+          <span class="sync-icon">🔄</span>
+        </button>
+      </div>
+      <div class="db-stats">
+        <div class="db-stat">
+          <span class="db-stat-label">Records:</span>
+          <span class="db-stat-value" id="db-records">--</span>
+        </div>
+        <div class="db-stat">
+          <span class="db-stat-label">Last Sync:</span>
+          <span class="db-stat-value" id="db-last-sync">Never</span>
+        </div>
+      </div>
+      <div class="sync-progress" id="sync-progress" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-text" id="progress-text">Syncing...</span>
+      </div>
+    </div>
+
     <footer class="popup-footer">
-      <span class="version">v1.1.4</span>
+      <span class="version">v1.1.8</span>
     </footer>
   </div>
 

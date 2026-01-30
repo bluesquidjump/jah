@@ -149,6 +149,122 @@ body {
   color: var(--jah-danger);
 }
 
+/* Database Section */
+.popup-db-section {
+  background: var(--jah-pale-blue);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--jah-light-blue);
+}
+
+.db-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.db-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--jah-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sync-btn {
+  background: var(--jah-white);
+  border: 1px solid var(--jah-light-blue);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sync-btn:hover {
+  background: var(--jah-blue);
+  border-color: var(--jah-blue);
+}
+
+.sync-btn:hover .sync-icon {
+  filter: brightness(0) invert(1);
+}
+
+.sync-btn.syncing {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-btn.syncing .sync-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sync-icon {
+  font-size: 14px;
+  transition: filter 0.2s;
+}
+
+.db-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.db-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.db-stat-label {
+  color: var(--jah-text-muted);
+}
+
+.db-stat-value {
+  font-weight: 600;
+  color: var(--jah-navy);
+}
+
+/* Sync Progress */
+.sync-progress {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--jah-light-blue);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--jah-white);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--jah-blue);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-text {
+  font-size: 10px;
+  color: var(--jah-text-muted);
+  display: block;
+  text-align: center;
+}
+
 /* Footer */
 .popup-footer {
   text-align: center;

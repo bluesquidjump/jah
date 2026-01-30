@@ -229,8 +229,9 @@ When a malware fingerprint is detected, JAH displays it with a **red glow** and 
 | `storage` | Store API keys, settings, and history |
 | `contextMenus` | Right-click "Enrich JA4 Hash" option |
 | `activeTab` | Read selected text for analysis |
+| `alarms` | Schedule daily JA4DB sync |
 | `https://api.anthropic.com/*` | Claude AI API calls |
-| `https://ja4db.com/*` | JA4 Database lookups |
+| `https://ja4db.com/*` | JA4 Database lookups and download |
 
 ### Architecture
 
@@ -252,7 +253,8 @@ jah/
 │   └── options.js
 ├── lib/                   # Shared libraries
 │   ├── ja4-parser.js      # JA4 fingerprint parsing
-│   ├── ja4db-client.js    # JA4DB API client
+│   ├── ja4db-client.js    # JA4DB remote API client
+│   ├── ja4db-local.js     # Local IndexedDB manager
 │   ├── claude-api.js      # Claude AI client
 │   └── mcp-client.js      # MCP integrations
 ├── data/                  # Static data
@@ -263,6 +265,13 @@ jah/
 ---
 
 ## Changelog
+
+### v1.1.8 (2026-01-30)
+- **Local JA4DB** — Downloads full JA4 Database (~258K records) to IndexedDB for instant lookups
+- **No Rate Limits** — Local database eliminates API rate limiting for high-volume pages (Zeek results, etc.)
+- **Popup Sync UI** — Toolbar popup shows database status, last sync time, and manual sync button
+- **Auto-Sync** — Daily automatic sync keeps local database up-to-date
+- **Diff-Based Sync** — Uses content hashing to minimize database writes during sync
 
 ### v1.1.7 (2026-01-30)
 - **Fixed JA4S Attribution** — JA4S (server) fingerprints no longer incorrectly labeled with client application names
