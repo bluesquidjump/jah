@@ -106,8 +106,9 @@ When changes are complete and ready for release:
 2. Commit all changes with descriptive message
 3. Sign extension with Mozilla:
    ```bash
-   web-ext sign --api-key="REDACTED_API_KEY" --api-secret="REDACTED_API_SECRET" --channel=unlisted
+   web-ext sign --api-key="$MOZILLA_API_KEY" --api-secret="$MOZILLA_API_SECRET" --channel=unlisted
    ```
+   Note: Credentials stored in environment variables or secure keychain
 4. Create git tag: `git tag -a vX.X.X -m "Release notes"`
 5. Push commits and tag: `git push origin main && git push origin vX.X.X`
 6. Create GitHub Release with signed XPI: `gh release create vX.X.X --title "..." --notes "..." <xpi-file>`
