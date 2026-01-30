@@ -45,10 +45,11 @@ Options (options.js)            → Settings/API key configuration
 
 **Data flow for enrichment:**
 1. Content script detects fingerprint → sends to background
-2. Background validates, checks cache (5min TTL), applies rate limiting (20/60s)
-3. Queries JA4DB, then Claude API with parsed components + database results
-4. Result cached and added to history (last 50 stored)
-5. Sidebar displays with category color coding based on LLM assessment
+2. Background validates, checks cache (5min TTL)
+3. Queries local JA4DB (IndexedDB, ~258K records), falls back to remote API if local not ready
+4. For full analysis, queries Claude API with parsed components + database results
+5. Result cached and added to history (last 50 stored)
+6. Sidebar displays with category color coding based on LLM assessment
 
 ## Key Implementation Details
 
@@ -116,6 +117,14 @@ When changes are complete and ready for release:
 **IMPORTANT:** Always create and push a new GitHub Release when changes are complete. Do not wait to be asked.
 
 ## Recent Changes
+
+### v1.1.8
+- Added local JA4DB using IndexedDB for instant lookups (~258K records)
+- Full database downloaded on first extension load
+- Eliminated rate limiting for high-volume pages (Zeek results, etc.)
+- Popup shows database status, last sync time, and manual sync button
+- Daily auto-sync with diff-based updates (only changes written)
+- Added alarms permission for scheduled sync
 
 ### v1.1.7
 - Fixed JA4S fingerprints incorrectly showing client application (e.g., Sliver) when it's the JA4 that identifies the malware
