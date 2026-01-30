@@ -17,9 +17,11 @@ JAH (JA4 Hash Enrichment) is a Firefox WebExtension (Manifest V2) that detects J
 # Package for distribution
 web-ext build
 
-# Sign with Mozilla (requires API credentials)
-web-ext sign --api-key=<key> --api-secret=<secret> --channel=unlisted
+# Sign with Mozilla (uses environment variables)
+web-ext sign --api-key="$MOZILLA_API_KEY" --api-secret="$MOZILLA_API_SECRET" --channel=unlisted
 ```
+
+**Note:** Mozilla signing credentials are configured as environment variables `MOZILLA_API_KEY` and `MOZILLA_API_SECRET`. Always use these variables - never hardcode credentials.
 
 No build step required - pure JavaScript. Test manually using `test/test-page.html` which contains sample fingerprints.
 
@@ -109,12 +111,14 @@ When changes are complete and ready for release:
    ```bash
    web-ext sign --api-key="$MOZILLA_API_KEY" --api-secret="$MOZILLA_API_SECRET" --channel=unlisted
    ```
-   Note: Credentials stored in environment variables or secure keychain
 4. Create git tag: `git tag -a vX.X.X -m "Release notes"`
 5. Push commits and tag: `git push origin main && git push origin vX.X.X`
 6. Create GitHub Release with signed XPI: `gh release create vX.X.X --title "..." --notes "..." <xpi-file>`
 
-**IMPORTANT:** Always create and push a new GitHub Release when changes are complete. Do not wait to be asked.
+**IMPORTANT:**
+- Always use the `$MOZILLA_API_KEY` and `$MOZILLA_API_SECRET` environment variables for signing - they are already configured
+- Always create and push a new GitHub Release when changes are complete - do not wait to be asked
+- Never commit credentials to the repository
 
 ## Recent Changes
 
