@@ -104,7 +104,10 @@ In `content.js determineCategory()`:
 When changes are complete and ready for release:
 1. Bump version in `manifest.json`
 2. Commit all changes with descriptive message
-3. Sign extension: `web-ext sign --api-key=<key> --api-secret=<secret> --channel=unlisted`
+3. Sign extension with Mozilla:
+   ```bash
+   web-ext sign --api-key="REDACTED_API_KEY" --api-secret="REDACTED_API_SECRET" --channel=unlisted
+   ```
 4. Create git tag: `git tag -a vX.X.X -m "Release notes"`
 5. Push commits and tag: `git push origin main && git push origin vX.X.X`
 6. Create GitHub Release with signed XPI: `gh release create vX.X.X --title "..." --notes "..." <xpi-file>`
