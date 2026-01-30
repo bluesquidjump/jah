@@ -113,6 +113,13 @@ When changes are complete and ready for release:
 
 ## Recent Changes
 
+### v1.1.7
+- Fixed JA4S fingerprints incorrectly showing client application (e.g., Sliver) when it's the JA4 that identifies the malware
+- Tooltip now shows "Server response (client was X)" for JA4S fingerprints with related applications
+- Color coding now applied when JA4DB record is verified OR LLM assessment has high confidence
+- Added purple "verified" styling for verified JA4DB records
+- Added pulse animation for high-confidence assessments
+
 ### v1.1.6
 - Added debug mode with console access via `window.JAH_DEBUG`
 - Fox icons now show for ALL detected fingerprints (not just JA4DB matches)

@@ -264,6 +264,12 @@ jah/
 
 ## Changelog
 
+### v1.1.7 (2026-01-30)
+- **Fixed JA4S Attribution** — JA4S (server) fingerprints no longer incorrectly labeled with client application names
+- **Smarter Tooltips** — Shows "Server response (client was X)" for JA4S fingerprints
+- **Verified Styling** — Purple glow for JA4DB verified records
+- **High Confidence Indicator** — Pulse animation for high-confidence LLM assessments
+
 ### v1.1.6 (2026-01-30)
 - **Debug Mode** — Console access via `window.JAH_DEBUG` for troubleshooting
 - **Fox Icons for All Fingerprints** — Now shows icons for all detected fingerprints, not just JA4DB matches

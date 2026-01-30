@@ -260,32 +260,71 @@
     const hasKnownMatch = result.knownMatch;
     const hasAssessment = result.assessment;
 
+    // Check for verified JA4DB records
+    const ja4db = result.ja4db;
+    const isVerified = ja4db && ja4db.summary && ja4db.summary.verifiedCount > 0;
+
+    // Check for high-confidence LLM assessment
+    const isHighConfidence = hasAssessment && result.assessment.confidence === 'high';
+
     // Determine category for styling
     const category = determineCategory(result);
+
+    // Apply category styling if:
+    // 1. We have a category from any source, OR
+    // 2. JA4DB record is verified, OR
+    // 3. LLM assessment has high confidence
     if (category) {
       flag.classList.add(`jah-category-${category}`);
+    } else if (isVerified || isHighConfidence) {
+      // Verified or high-confidence but no specific category - mark as verified/trusted
+      flag.classList.add('jah-verified');
     } else if (!hasJa4dbMatch && !hasKnownMatch) {
       // No match found - mark as unverified
       flag.classList.add('jah-unverified');
     }
 
-    if (result.analysis && result.analysis.confident) {
-      tooltip.textContent = result.analysis.description ||
-        `${result.analysis.application || 'Unknown'} (${result.analysis.category || 'unknown'})`;
+    // Build tooltip text
+    if (hasAssessment && isHighConfidence) {
+      // High confidence LLM assessment takes priority
+      const categoryDisplay = result.assessment.category === 'benign' ? 'Legitimate' :
+        result.assessment.category.charAt(0).toUpperCase() + result.assessment.category.slice(1);
+      tooltip.textContent = `${categoryDisplay} (${result.assessment.confidence} confidence)`;
       flag.classList.add('jah-confident');
     } else if (hasKnownMatch) {
       tooltip.textContent = result.knownMatch.description ||
         `${result.knownMatch.name} (${result.knownMatch.category || 'unknown'})`;
     } else if (hasJa4dbMatch) {
-      const apps = result.ja4db.summary?.applications || [];
-      if (apps.length > 0) {
-        tooltip.textContent = `Likely: ${apps.slice(0, 2).join(' or ')}`;
+      // Use DIRECT applications only (not related ones from other fingerprint types)
+      const directApps = ja4db.summary?.directApplications || [];
+      const relatedApps = ja4db.summary?.relatedApplications || [];
+
+      if (directApps.length > 0) {
+        tooltip.textContent = `Likely: ${directApps.slice(0, 2).join(' or ')}`;
         // Add warning for malware
         if (category === 'malware') {
-          tooltip.textContent = `⚠ ${apps[0]} (known malware)`;
+          tooltip.textContent = `⚠ ${directApps[0]} (known malware)`;
+        }
+      } else if (relatedApps.length > 0) {
+        // Show that this is a related fingerprint, not the application itself
+        tooltip.textContent = `${type} seen with: ${relatedApps.slice(0, 2).join(', ')}`;
+        // Add note that this is the server response, not the client
+        if (type === 'JA4S') {
+          tooltip.textContent = `Server response (client was ${relatedApps[0]})`;
         }
       } else {
-        tooltip.textContent = `Found in JA4DB (${result.ja4db.matchCount} matches)`;
+        // Fallback to all applications if no direct/related distinction
+        const allApps = ja4db.summary?.applications || [];
+        if (allApps.length > 0) {
+          tooltip.textContent = `Likely: ${allApps.slice(0, 2).join(' or ')}`;
+        } else {
+          tooltip.textContent = `Found in JA4DB (${ja4db.matchCount} matches)`;
+        }
+      }
+
+      // Add verified indicator
+      if (isVerified) {
+        tooltip.textContent += ' ✓';
       }
     } else if (result.rateLimited) {
       tooltip.textContent = `${type} detected (rate limited)`;
