@@ -102,62 +102,94 @@
 }
 
 /* Category-specific styling */
+
+/* Malware - STRONG red indicator */
 .jah-category-malware .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #c41230);
+  filter: drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 12px #ef4444);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
 .jah-category-malware .jah-tooltip {
-  background: #c41230;
-  border: 1px solid #8b0000;
+  background: #dc2626;
+  border: 2px solid #ef4444;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
 }
 
 .jah-category-malware .jah-tooltip::after {
-  border-top-color: #c41230;
+  border-top-color: #dc2626;
 }
 
+/* VPN - blue glow */
 .jah-category-vpn .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #117aca);
+  filter: drop-shadow(0 0 8px #3b82f6) drop-shadow(0 0 12px #3b82f6);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
+/* Browser/Benign - STRONG green indicator */
 .jah-category-browser .jah-fox-icon,
 .jah-category-benign .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #1a8754);
+  filter: drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 12px #22c55e);
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
 .jah-category-browser .jah-tooltip,
 .jah-category-benign .jah-tooltip {
-  background: #1a8754;
-  border: 1px solid #0d5a39;
+  background: #16a34a;
+  border: 2px solid #22c55e;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
 }
 
 .jah-category-browser .jah-tooltip::after,
 .jah-category-benign .jah-tooltip::after {
-  border-top-color: #1a8754;
+  border-top-color: #16a34a;
 }
 
+/* Tool - navy glow */
 .jah-category-tool .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #004b87);
+  filter: drop-shadow(0 0 8px #1e40af) drop-shadow(0 0 12px #1e40af);
+  background: radial-gradient(circle, rgba(30, 64, 175, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
+/* Bot - orange glow */
 .jah-category-bot .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #b45309);
+  filter: drop-shadow(0 0 8px #f97316) drop-shadow(0 0 12px #f97316);
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
+/* Library - light blue glow */
 .jah-category-library .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #7aacdc);
+  filter: drop-shadow(0 0 8px #38bdf8) drop-shadow(0 0 12px #38bdf8);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
+/* Suspicious - STRONG orange indicator */
 .jah-category-suspicious .jah-fox-icon {
-  filter: drop-shadow(0 0 6px #b45309);
+  filter: drop-shadow(0 0 8px #ea580c) drop-shadow(0 0 12px #ea580c);
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 2px;
 }
 
 .jah-category-suspicious .jah-tooltip {
-  background: #b45309;
-  border: 1px solid #92400e;
+  background: #ea580c;
+  border: 2px solid #fb923c;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4);
 }
 
 .jah-category-suspicious .jah-tooltip::after {
-  border-top-color: #b45309;
+  border-top-color: #ea580c;
 }
 
 /* Responsive adjustments */
@@ -374,4 +406,46 @@
 
 .jah-panel-sidebar-hint strong {
   color: var(--jah-navy);
+}
+
+/* Unverified fingerprints (detected but not in JA4DB) */
+.jah-unverified .jah-fox-icon {
+  filter: grayscale(50%) opacity(0.7);
+}
+
+.jah-unverified .jah-tooltip {
+  background: #6b7280;
+  border: 1px solid #9ca3af;
+}
+
+.jah-unverified .jah-tooltip::after {
+  border-top-color: #6b7280;
+}
+
+/* Rate limited */
+.jah-rate-limited .jah-fox-icon {
+  filter: sepia(100%) hue-rotate(180deg) opacity(0.6);
+}
+
+.jah-rate-limited .jah-tooltip {
+  background: #0891b2;
+  border: 1px solid #22d3ee;
+}
+
+.jah-rate-limited .jah-tooltip::after {
+  border-top-color: #0891b2;
+}
+
+/* Error state */
+.jah-error .jah-fox-icon {
+  filter: grayscale(100%) opacity(0.5);
+}
+
+.jah-error .jah-tooltip {
+  background: #78716c;
+  border: 1px solid #a8a29e;
+}
+
+.jah-error .jah-tooltip::after {
+  border-top-color: #78716c;
 }

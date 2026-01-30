@@ -111,8 +111,17 @@ When changes are complete and ready for release:
 
 **IMPORTANT:** Always create and push a new GitHub Release when changes are complete. Do not wait to be asked.
 
-## Recent Changes (v1.1.5)
+## Recent Changes
 
+### v1.1.6
+- Added debug mode with console access via `window.JAH_DEBUG`
+- Fox icons now show for ALL detected fingerprints (not just JA4DB matches)
+- Fixed JA4S regex to match variants with alphanumeric suffixes (e.g., `t1203h1_...`)
+- Much more visible category colors with double drop-shadow and radial gradients
+- Increased rate limit from 20 to 100 requests/60s
+- Added styling for unverified, rate-limited, and error states
+
+### v1.1.5
 - Added structured ASSESSMENT output parsing from Claude responses
 - JA4DB results now distinguish direct vs related applications by fingerprint type
 - LLM assessment drives fox icon color coding (previously only used JA4DB/local DB)

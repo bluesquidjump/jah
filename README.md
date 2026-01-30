@@ -264,6 +264,13 @@ jah/
 
 ## Changelog
 
+### v1.1.6 (2026-01-30)
+- **Debug Mode** — Console access via `window.JAH_DEBUG` for troubleshooting
+- **Fox Icons for All Fingerprints** — Now shows icons for all detected fingerprints, not just JA4DB matches
+- **Improved JA4S Detection** — Fixed regex to match fingerprint variants with alphanumeric suffixes
+- **Enhanced Visibility** — Much brighter category colors with double glow effects
+- **Higher Rate Limit** — Increased from 20 to 100 requests/minute for pages with many fingerprints
+
 ### v1.1.5 (2026-01-30)
 - **LLM-Driven Categorization** — Claude's structured assessment now drives fox icon color coding
 - **Assessment Badge** — Sidebar displays category, threat level, and confidence

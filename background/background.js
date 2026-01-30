@@ -11,9 +11,10 @@ const quickLookupCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // Rate limiting for page scanning
+// Increased from 20 to 100 to handle pages with many fingerprints
 const rateLimiter = {
   requests: [],
-  maxRequests: 20,
+  maxRequests: 100,
   windowMs: 60000,
 
   canMakeRequest() {
@@ -208,12 +209,21 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // Get settings for content script
   if (message.type === 'get-settings') {
-    browser.storage.local.get(['claudeApiKey', 'claudeModel', 'scanEnabled'])
+    browser.storage.local.get(['claudeApiKey', 'claudeModel', 'scanEnabled', 'debugMode'])
       .then(result => sendResponse({
         hasApiKey: !!result.claudeApiKey,
         model: result.claudeModel || 'claude-sonnet-4-20250514',
-        scanEnabled: result.scanEnabled !== false // Default to true
+        scanEnabled: result.scanEnabled !== false, // Default to true
+        debugMode: result.debugMode === true // Default to false
       }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  // Toggle debug mode
+  if (message.type === 'set-debug-mode') {
+    browser.storage.local.set({ debugMode: message.enabled })
+      .then(() => sendResponse({ success: true, debugMode: message.enabled }))
       .catch(error => sendResponse({ error: error.message }));
     return true;
   }

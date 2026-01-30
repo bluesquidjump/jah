@@ -6,13 +6,23 @@
 (function() {
   'use strict';
 
+  // Debug mode - set via storage or manually
+  let DEBUG_MODE = false;
+
+  function debug(...args) {
+    if (DEBUG_MODE) {
+      console.log('JAH DEBUG:', ...args);
+    }
+  }
+
   // JA4 patterns for detection (with word boundaries for scanning)
   const JA4_PATTERNS = {
     // JA4: TLS client fingerprint - t13d1516h2_8daaf6152771_b0da82dd1658
     JA4: /\b[tq][0-9]{2}[di][0-9]{4,6}[a-z0-9]{0,4}_[a-f0-9]{12}_[a-f0-9]{12}\b/gi,
 
-    // JA4S: TLS server fingerprint - t130200_1301_234ea6891581
-    JA4S: /\b[tq][0-9]{6}_[a-f0-9]{4}_[a-f0-9]{12}\b/gi,
+    // JA4S: TLS server fingerprint - t130200_1301_234ea6891581 or t1203h1_c02f_f90b16d5c5e4
+    // Updated to allow alphanumeric in first segment (some variants have h1, h2, etc.)
+    JA4S: /\b[tq][0-9]{4,6}[a-z0-9]{0,2}_[a-f0-9]{4}_[a-f0-9]{12}\b/gi,
 
     // JA4H: HTTP client fingerprint - ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726c
     JA4H: /\b[a-z]{2}[0-9]{2}[a-z]{2}[0-9]{2}[a-z]{4}_[a-f0-9]{12}_[a-f0-9]{12}_[a-f0-9]{12}\b/gi,
@@ -24,7 +34,7 @@
   // Simple patterns for selection detection (no word boundaries)
   const SELECTION_PATTERNS = [
     /[tq][0-9]{2}[di][0-9]{4,6}[a-z0-9]{0,4}_[a-f0-9]{12}_[a-f0-9]{12}/i,
-    /[tq][0-9]{6}_[a-f0-9]{4}_[a-f0-9]{12}/i,
+    /[tq][0-9]{4,6}[a-z0-9]{0,2}_[a-f0-9]{4}_[a-f0-9]{12}/i,
     /[a-z]{2}[0-9]{2}[a-z]{2}[0-9]{2}[a-z]{4}_[a-f0-9]{12}_[a-f0-9]{12}_[a-f0-9]{12}/i,
     /[a-f0-9]{12}_[a-f0-9]{12}_[a-f0-9]{12}/i,
     /c[0-9]{1,4}s[0-9]{1,4}p[0-9]{1,4}_[io][0-9]{1,4}[io][0-9]{1,4}/i,
@@ -34,6 +44,15 @@
   // Track processed nodes and hashes
   const processedNodes = new WeakSet();
   const processedHashes = new Map();
+
+  // Stats for debugging
+  const stats = {
+    detected: 0,
+    lookupAttempts: 0,
+    lookupSuccesses: 0,
+    rateLimited: 0,
+    errors: 0
+  };
 
   // Fox icon URL
   const FOX_ICON_URL = browser.runtime.getURL('icons/ja4-fox-flag.png');
@@ -67,15 +86,19 @@
     if (!hash || typeof hash !== 'string') return null;
     const trimmed = hash.trim();
 
+    // JA4: t13d1516h2_8daaf6152771_b0da82dd1658
     if (/^[tq][0-9]{2}[di][0-9]{4,6}[a-z0-9]{0,4}_[a-f0-9]{12}_[a-f0-9]{12}$/i.test(trimmed)) {
       return 'JA4';
     }
-    if (/^[tq][0-9]{6}_[a-f0-9]{4}_[a-f0-9]{12}$/i.test(trimmed)) {
+    // JA4S: t130200_1301_234ea6891581 or t1203h1_c02f_f90b16d5c5e4
+    if (/^[tq][0-9]{4,6}[a-z0-9]{0,2}_[a-f0-9]{4}_[a-f0-9]{12}$/i.test(trimmed)) {
       return 'JA4S';
     }
+    // JA4H: ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726c
     if (/^[a-z]{2}[0-9]{2}[a-z]{2}[0-9]{2}[a-z]{4}_[a-f0-9]{12}_[a-f0-9]{12}_[a-f0-9]{12}$/i.test(trimmed)) {
       return 'JA4H';
     }
+    // JA4SSH: c76s56p21_i76o21
     if (/^c[0-9]{1,4}s[0-9]{1,4}p[0-9]{1,4}_[io][0-9]{1,4}[io][0-9]{1,4}$/i.test(trimmed)) {
       return 'JA4SSH';
     }
@@ -224,7 +247,7 @@
 
     const img = document.createElement('img');
     img.src = FOX_ICON_URL;
-    img.alt = 'JA4 Match';
+    img.alt = 'JA4 Fingerprint';
     img.className = 'jah-fox-icon';
     flag.appendChild(img);
 
@@ -232,20 +255,28 @@
     const tooltip = document.createElement('span');
     tooltip.className = 'jah-tooltip';
 
+    // Check if we have any data about this fingerprint
+    const hasJa4dbMatch = result.ja4db && result.ja4db.found;
+    const hasKnownMatch = result.knownMatch;
+    const hasAssessment = result.assessment;
+
     // Determine category for styling
     const category = determineCategory(result);
     if (category) {
       flag.classList.add(`jah-category-${category}`);
+    } else if (!hasJa4dbMatch && !hasKnownMatch) {
+      // No match found - mark as unverified
+      flag.classList.add('jah-unverified');
     }
 
     if (result.analysis && result.analysis.confident) {
       tooltip.textContent = result.analysis.description ||
         `${result.analysis.application || 'Unknown'} (${result.analysis.category || 'unknown'})`;
       flag.classList.add('jah-confident');
-    } else if (result.knownMatch) {
+    } else if (hasKnownMatch) {
       tooltip.textContent = result.knownMatch.description ||
         `${result.knownMatch.name} (${result.knownMatch.category || 'unknown'})`;
-    } else if (result.ja4db && result.ja4db.found) {
+    } else if (hasJa4dbMatch) {
       const apps = result.ja4db.summary?.applications || [];
       if (apps.length > 0) {
         tooltip.textContent = `Likely: ${apps.slice(0, 2).join(' or ')}`;
@@ -256,8 +287,14 @@
       } else {
         tooltip.textContent = `Found in JA4DB (${result.ja4db.matchCount} matches)`;
       }
+    } else if (result.rateLimited) {
+      tooltip.textContent = `${type} detected (rate limited)`;
+      flag.classList.add('jah-rate-limited');
+    } else if (result.error) {
+      tooltip.textContent = `${type} detected (lookup error)`;
+      flag.classList.add('jah-error');
     } else {
-      tooltip.textContent = 'JA4 fingerprint detected';
+      tooltip.textContent = `${type} detected (not in JA4DB)`;
     }
 
     // Add "Click for full analysis" hint
@@ -452,6 +489,9 @@
 
     if (fingerprints.length === 0) return;
 
+    debug(`Found ${fingerprints.length} fingerprints in text node`);
+    stats.detected += fingerprints.length;
+
     processedNodes.add(textNode);
 
     const fragment = document.createDocumentFragment();
@@ -472,6 +512,9 @@
       let result = processedHashes.get(fp.hash.toLowerCase());
 
       if (!result) {
+        stats.lookupAttempts++;
+        debug(`Looking up: ${fp.hash} (${fp.type})`);
+
         // Add loading indicator
         const loadingFlag = document.createElement('span');
         loadingFlag.className = 'jah-flag jah-loading';
@@ -487,21 +530,35 @@
           processedHashes.set(fp.hash.toLowerCase(), lookupResult);
           loadingFlag.remove();
 
-          // Add fox flag if we have a match
+          // Check for rate limiting or errors
+          if (lookupResult.rateLimited) {
+            stats.rateLimited++;
+            debug(`Rate limited: ${fp.hash}`);
+          } else if (lookupResult.error) {
+            stats.errors++;
+            debug(`Error for ${fp.hash}: ${lookupResult.error}`);
+          }
+
+          // Always add fox flag for detected fingerprints
+          // Color/style will indicate whether JA4DB had a match
+          const flag = createFoxFlag(fp.hash, fp.type, lookupResult);
+          wrapper.appendChild(flag);
+
           if (lookupResult.ja4db && lookupResult.ja4db.found) {
-            const flag = createFoxFlag(fp.hash, fp.type, lookupResult);
-            wrapper.appendChild(flag);
+            stats.lookupSuccesses++;
+            debug(`JA4DB match: ${fp.hash}`);
+          } else {
+            debug(`No JA4DB match: ${fp.hash}`);
           }
         }).catch(error => {
+          stats.errors++;
           console.error('JAH lookup error:', error);
           loadingFlag.remove();
         });
       } else {
-        // Use cached result
-        if (result.ja4db && result.ja4db.found) {
-          const flag = createFoxFlag(fp.hash, fp.type, result);
-          wrapper.appendChild(flag);
-        }
+        // Use cached result - always show fox icon
+        const flag = createFoxFlag(fp.hash, fp.type, result);
+        wrapper.appendChild(flag);
       }
 
       fragment.appendChild(wrapper);
@@ -636,17 +693,37 @@
   // ============================================
 
   async function init() {
-    // Check if scanning is enabled
+    // Check if scanning is enabled and load debug mode
     const settings = await browser.runtime.sendMessage({ type: 'get-settings' }).catch(() => ({}));
     if (settings.scanEnabled === false) {
       console.log('JAH page scanning disabled');
       return;
     }
 
-    console.log('JAH scanner initializing...');
+    // Enable debug mode if set in storage
+    DEBUG_MODE = settings.debugMode === true;
+
+    console.log('JAH scanner initializing...' + (DEBUG_MODE ? ' (DEBUG MODE)' : ''));
 
     // Initial page scan
     walkDOM(document.body);
+
+    // Report stats after initial scan (with delay to let lookups complete)
+    if (DEBUG_MODE) {
+      setTimeout(() => {
+        console.log('JAH STATS:', JSON.stringify(stats, null, 2));
+      }, 5000);
+    }
+
+    // Expose debug functions to window for console access
+    window.JAH_DEBUG = {
+      getStats: () => stats,
+      enableDebug: () => { DEBUG_MODE = true; console.log('JAH debug mode enabled'); },
+      disableDebug: () => { DEBUG_MODE = false; console.log('JAH debug mode disabled'); },
+      getProcessedHashes: () => Array.from(processedHashes.keys()),
+      rescan: () => { walkDOM(document.body); console.log('JAH rescan complete'); }
+    };
+    debug('Debug functions available at window.JAH_DEBUG');
 
     // Watch for dynamic content
     const observer = new MutationObserver((mutations) => {
