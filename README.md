@@ -45,12 +45,9 @@ JAH (JA4 Hash Enrichment) is a Firefox extension that helps security analysts, t
 | Type | Description | Example |
 |------|-------------|---------|
 | **JA4** | TLS Client Fingerprint | `t13d1516h2_8daaf6152771_b0da82dd1658` |
-| **JA4S** | TLS Server Fingerprint | `t130200_1301_234ea6891581JA4S detected (not in JA4DB)
-Click for full analysis` |
-| **JA4H** | HTTP Client Fingerprint | `ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726cFound in JA4DB (15 matches)
-Click for full analysis` |
-| **JA4SSH** | SSH Fingerprint | `c76s56p21_i76o21JA4SSH detected (not in JA4DB)
-Click for full analysis` |
+| **JA4S** | TLS Server Fingerprint | `t130200_1301_234ea6891581` |
+| **JA4H** | HTTP Client Fingerprint | `ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726c` |
+| **JA4SSH** | SSH Fingerprint | `c76s56p21_i76o21` |
 
 ---
 
