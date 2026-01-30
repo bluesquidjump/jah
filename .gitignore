@@ -20,3 +20,6 @@ Thumbs.db
 # Node modules (if any)
 node_modules/
 .amo-upload-uuid
+
+# Claude Code local settings
+.claude/
