@@ -69,6 +69,7 @@ JAH automatically scans web pages for JA4 fingerprints and marks them with a fox
 | **Suspicious** | 🟠 Orange | Potentially concerning fingerprints |
 | **Bot** | 🟠 Orange | Web crawlers and automated tools |
 | **Browser** | 🟢 Green | Legitimate web browsers (Chrome, Firefox, Safari) |
+| **Benign** | 🟢 Green | Safe, legitimate applications (AI-assessed) |
 | **Tool** | 🔵 Navy | CLI tools (curl, wget) |
 | **VPN** | 🔵 Blue | VPN clients |
 | **Library** | 🔵 Light Blue | Programming libraries (Python requests, Go net/http) |
@@ -96,6 +97,7 @@ For detailed analysis, open the JAH sidebar (View → Sidebar → JAH):
 </p>
 
 The sidebar provides:
+- **Assessment Badge** — Category, threat level, and confidence from Claude AI
 - **AI-Generated Summary** — Claude analyzes the fingerprint and provides context
 - **JA4 Database Results** — Applications, libraries, user agents, and observation counts
 - **Parsed Components** — Breakdown of protocol version, SNI, cipher suites, etc.
@@ -257,6 +259,32 @@ jah/
 │   └── known-fingerprints.json
 └── icons/                 # Extension icons
 ```
+
+---
+
+## Changelog
+
+### v1.1.5 (2026-01-30)
+- **LLM-Driven Categorization** — Claude's structured assessment now drives fox icon color coding
+- **Assessment Badge** — Sidebar displays category, threat level, and confidence
+- **Type-Aware JA4DB Processing** — Distinguishes direct vs related fingerprint associations to prevent misattribution
+- **Benign Category** — New category for AI-assessed safe applications
+
+### v1.1.4 (2026-01-29)
+- Updated all icons to kitsune design
+- Added browser toolbar button
+
+### v1.1.3 (2026-01-29)
+- Visual assets and styling improvements
+
+### v1.1.2 (2026-01-29)
+- CSS rebranding to generic JAH naming
+
+### v1.1.1 (2026-01-29)
+- Mozilla-signed extension for permanent installation
+- Fixed fox icon click behavior (inline popup panel)
+- Fixed malware category color coding
+- Added comprehensive README with visual assets
 
 ---
 
