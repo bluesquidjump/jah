@@ -138,16 +138,10 @@ setInterval(() => {
   }
 }, 60000);
 
-// Create context menu items
+// Create context menu item (auto-detects JA4 fingerprints vs file hashes)
 browser.contextMenus.create({
   id: 'jah-enrich',
-  title: 'Enrich JA4 Hash',
-  contexts: ['selection']
-});
-
-browser.contextMenus.create({
-  id: 'jah-enrich-file-hash',
-  title: 'Enrich File Hash',
+  title: 'JAH Hash Enrichment',
   contexts: ['selection']
 });
 
@@ -180,7 +174,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
         } else {
           await browser.storage.local.set({
             pendingEnrichment: {
-              error: 'Selected text does not appear to be a valid JA4 fingerprint or file hash.',
+              error: 'Selected text does not appear to be a valid JA4 fingerprint or file hash (MD5, SHA1, SHA256).',
               text: selectedText,
               timestamp: Date.now()
             }
@@ -211,49 +205,6 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     })();
   }
 
-  if (info.menuItemId === 'jah-enrich-file-hash') {
-    // Treat selection as a file hash
-    const hashType = JA4Parser.detectFileHashType(selectedText);
-
-    browser.sidebarAction.open();
-
-    (async () => {
-      try {
-        if (hashType) {
-          await browser.storage.local.set({
-            pendingEnrichment: {
-              hash: selectedText.toLowerCase(),
-              isFileHash: true,
-              sourceUrl: tab.url,
-              sourceTitle: tab.title,
-              timestamp: Date.now()
-            }
-          });
-
-          setTimeout(() => {
-            try {
-              browser.runtime.sendMessage({
-                type: 'enrich-file-hash',
-                hash: selectedText.toLowerCase(),
-                sourceUrl: tab.url,
-                sourceTitle: tab.title
-              });
-            } catch (e) {}
-          }, 100);
-        } else {
-          await browser.storage.local.set({
-            pendingEnrichment: {
-              error: 'Selected text does not appear to be a valid file hash (MD5, SHA1, or SHA256).',
-              text: selectedText,
-              timestamp: Date.now()
-            }
-          });
-        }
-      } catch (e) {
-        console.error('JAH: Failed to store pending enrichment:', e);
-      }
-    })();
-  }
 });
 
 // Handle messages from content script and sidebar
@@ -345,15 +296,21 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  // Open sidebar and trigger enrichment (from fox icon click)
+  // Open sidebar and trigger enrichment (from icon click)
   if (message.type === 'open-sidebar-enrich') {
+    // Auto-detect hash type
+    const parsed = JA4Parser.parse(message.hash);
+    const isFileHash = parsed && JA4Parser.isFileHash(parsed.type);
+    const enrichType = isFileHash ? 'enrich-file-hash' : 'enrich-hash';
+
     // Open sidebar first
     browser.sidebarAction.open();
 
-    // Store pending enrichment
+    // Store pending enrichment with type info
     browser.storage.local.set({
       pendingEnrichment: {
         hash: message.hash,
+        isFileHash: isFileHash,
         timestamp: Date.now()
       }
     }).then(() => {
@@ -361,7 +318,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       setTimeout(() => {
         try {
           browser.runtime.sendMessage({
-            type: 'enrich-hash',
+            type: enrichType,
             hash: message.hash
           });
         } catch (e) {

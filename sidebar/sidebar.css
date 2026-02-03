@@ -38,6 +38,11 @@
   padding: 0;
 }
 
+/* Generic hidden class */
+.hidden {
+  display: none !important;
+}
+
 body {
   font-family: 'Georgia', 'Times New Roman', serif;
   font-size: 14px;

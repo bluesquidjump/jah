@@ -122,26 +122,46 @@
     }
 
     // Page URL/title contains CTI keywords
-    const ctiKeywords = /\b(virustotal|malware|threat|ioc|abuse|malwarebazaar|hybrid-analysis|any\.run|sandbox|intel|security)\b/i;
+    const ctiKeywords = /\b(virustotal|malware|threat|ioc|abuse|malwarebazaar|hybrid-analysis|any\.run|sandbox|intel|security|crowdstrike|mandiant|paloalto|unit42|talos|sentinelone|trellix|fireeye|fortinet|sophos)\b/i;
     if (ctiKeywords.test(pageUrl) || ctiKeywords.test(pageTitle)) {
       score += 20;
     }
 
     // Inside semantic elements that suggest hash content
+    // Accumulate score for nested elements (e.g. <code> inside <td> in an IOC table)
+    let semanticScore = 0;
     let el = parentEl;
     for (let i = 0; i < 3 && el; i++) {
       const tag = el.tagName;
-      if (tag === 'CODE' || tag === 'PRE' || tag === 'TD' || tag === 'SAMP' || tag === 'KBD') {
-        score += 15;
-        break;
+      if (tag === 'CODE' || tag === 'PRE' || tag === 'SAMP' || tag === 'KBD') {
+        semanticScore += 15;
+      } else if (tag === 'TD' || tag === 'TH') {
+        semanticScore += 10;
+        // Check table headers for CTI keywords (catches IOC tables on any site)
+        try {
+          const table = el.closest('table');
+          if (table) {
+            // Check <thead> first (proper semantic markup)
+            const thead = table.querySelector('thead');
+            let headerText = thead ? thead.textContent.toLowerCase() : '';
+            // Also check first <tr> (common non-semantic pattern where header is just first row)
+            if (!headerText) {
+              const firstRow = table.querySelector('tr');
+              if (firstRow) headerText = firstRow.textContent.toLowerCase();
+            }
+            if (headerText && ctiLabelPatterns.test(headerText)) {
+              score += 25;
+            }
+          }
+        } catch (e) { /* ignore */ }
       }
       const cls = (el.className || '').toLowerCase();
       if (cls.includes('hash') || cls.includes('ioc') || cls.includes('indicator') || cls.includes('fingerprint')) {
-        score += 15;
-        break;
+        semanticScore += 15;
       }
       el = el.parentNode;
     }
+    score += Math.min(30, semanticScore);
 
     // Multiple hash-length hex strings on the same page (IOC list signal)
     if (hashCandidateCount > 3) {
@@ -327,6 +347,9 @@
         if (isRangeCovered(match.index, match.index + hash.length)) continue;
         if (seen.has(hash.toLowerCase())) continue;
 
+        // Count ALL candidates before filtering (page-level signal for scoring)
+        hashCandidateCount++;
+
         // Confidence scoring to reduce false positives
         if (textNode) {
           const confidence = scoreHashConfidence(hash, textNode);
@@ -335,8 +358,6 @@
             continue;
           }
         }
-
-        hashCandidateCount++;
         seen.add(hash.toLowerCase());
         const range = { start: match.index, end: match.index + hash.length };
         coveredRanges.push(range);
@@ -964,6 +985,20 @@
   // Initialization
   // ============================================
 
+  /**
+   * Pre-scan page body to count hash candidates before individual node processing.
+   * Sets hashCandidateCount so confidence scoring has accurate page-level context.
+   */
+  function prescanHashCandidates() {
+    const bodyText = document.body.textContent;
+    // Count boundary-delimited hex strings at hash lengths
+    const sha256 = bodyText.match(/\b[a-f0-9]{64}\b/gi);
+    const sha1 = bodyText.match(/\b[a-f0-9]{40}\b/gi);
+    const md5 = bodyText.match(/\b[a-f0-9]{32}\b/gi);
+    hashCandidateCount = (sha256?.length || 0) + (sha1?.length || 0) + (md5?.length || 0);
+    debug(`Prescan found ${hashCandidateCount} hash candidates`);
+  }
+
   async function init() {
     // Check if scanning is enabled and load debug mode
     const settings = await browser.runtime.sendMessage({ type: 'get-settings' }).catch(() => ({}));
@@ -976,6 +1011,9 @@
     DEBUG_MODE = settings.debugMode === true;
 
     console.log('JAH scanner initializing...' + (DEBUG_MODE ? ' (DEBUG MODE)' : ''));
+
+    // Pre-scan page to count hash candidates (fixes chicken-and-egg scoring issue)
+    prescanHashCandidates();
 
     // Initial page scan
     walkDOM(document.body);

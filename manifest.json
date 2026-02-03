@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "JAH - JA4 Hash Enrichment",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enrich JA4 fingerprint hashes with threat intelligence using Claude AI",
   "author": "Security Tools",
   "browser_specific_settings": {
