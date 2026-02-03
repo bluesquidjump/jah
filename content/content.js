@@ -31,6 +31,16 @@
     JA4SSH: /\bc[0-9]{1,4}s[0-9]{1,4}p[0-9]{1,4}_[io][0-9]{1,4}[io][0-9]{1,4}\b/gi
   };
 
+  // File hash patterns (order: longest first to avoid substring matches)
+  const FILE_HASH_PATTERNS = {
+    SHA256: /\b[a-f0-9]{64}\b/gi,
+    SHA1: /\b[a-f0-9]{40}\b/gi,
+    MD5: /\b[a-f0-9]{32}\b/gi
+  };
+
+  // Track hash candidates per page for threshold adjustment
+  let hashCandidateCount = 0;
+
   // Simple patterns for selection detection (no word boundaries)
   const SELECTION_PATTERNS = [
     /[tq][0-9]{2}[di][0-9]{4,6}[a-z0-9]{0,4}_[a-f0-9]{12}_[a-f0-9]{12}/i,
@@ -54,8 +64,129 @@
     errors: 0
   };
 
-  // Fox icon URL
+  // Icon URLs
   const FOX_ICON_URL = browser.runtime.getURL('icons/ja4-fox-flag.png');
+  const BUG_ICON_URL = browser.runtime.getURL('icons/hash-bug.svg');
+
+  /**
+   * Check if a detected type is a file hash
+   */
+  function isFileHashType(type) {
+    return ['MD5', 'SHA1', 'SHA256'].includes(type);
+  }
+
+  /**
+   * Score confidence that a hex string is actually a file hash (not a false positive)
+   * Returns 0-100
+   */
+  function scoreHashConfidence(hexString, textNode) {
+    let score = 0;
+    const parentEl = textNode.parentNode;
+    const text = textNode.textContent;
+    const pageTitle = document.title.toLowerCase();
+    const pageUrl = window.location.href.toLowerCase();
+
+    // Gather surrounding text from multiple ancestor levels for context.
+    // Walk up to 4 levels but cap text length to avoid matching entire page.
+    let surroundingText = '';
+    let ancestor = parentEl;
+    for (let i = 0; i < 4 && ancestor && ancestor !== document.body; i++) {
+      surroundingText = (ancestor.textContent || '').toLowerCase();
+      // Stop once we have enough context (but not the whole page)
+      if (surroundingText.length > 200) break;
+      ancestor = ancestor.parentNode;
+    }
+    // Cap to 500 chars around the hash to avoid matching page-wide content
+    const hashIdx = surroundingText.indexOf(hexString.toLowerCase());
+    if (hashIdx > -1 && surroundingText.length > 500) {
+      const ctxStart = Math.max(0, hashIdx - 200);
+      const ctxEnd = Math.min(surroundingText.length, hashIdx + hexString.length + 200);
+      surroundingText = surroundingText.substring(ctxStart, ctxEnd);
+    }
+
+    // Label patterns that indicate CTI/hash context
+    // Note: "hash" alone is included but we separately check for git context to avoid
+    // matching descriptions like "Git commit hash" in non-CTI contexts
+    const ctiLabelPatterns = /\b(md5|sha256|sha1|sha-256|sha-1|ioc|indicator|sample|malware|checksum|file\s*hash|threat)\b/i;
+    // Broader pattern including "hash" by itself
+    const hashWordPattern = /\b(hash)\b/i;
+
+    // --- Positive signals ---
+
+    // Nearby text contains specific CTI labels (not just "hash" alone)
+    if (ctiLabelPatterns.test(surroundingText)) {
+      score += 30;
+    } else if (hashWordPattern.test(surroundingText)) {
+      // "hash" alone is weaker - only +15, and can be overridden by git context
+      score += 15;
+    }
+
+    // Page URL/title contains CTI keywords
+    const ctiKeywords = /\b(virustotal|malware|threat|ioc|abuse|malwarebazaar|hybrid-analysis|any\.run|sandbox|intel|security)\b/i;
+    if (ctiKeywords.test(pageUrl) || ctiKeywords.test(pageTitle)) {
+      score += 20;
+    }
+
+    // Inside semantic elements that suggest hash content
+    let el = parentEl;
+    for (let i = 0; i < 3 && el; i++) {
+      const tag = el.tagName;
+      if (tag === 'CODE' || tag === 'PRE' || tag === 'TD' || tag === 'SAMP' || tag === 'KBD') {
+        score += 15;
+        break;
+      }
+      const cls = (el.className || '').toLowerCase();
+      if (cls.includes('hash') || cls.includes('ioc') || cls.includes('indicator') || cls.includes('fingerprint')) {
+        score += 15;
+        break;
+      }
+      el = el.parentNode;
+    }
+
+    // Multiple hash-length hex strings on the same page (IOC list signal)
+    if (hashCandidateCount > 3) {
+      score += 10;
+    }
+
+    // SHA256 length bonus (64 chars is much less likely to be a false positive)
+    if (hexString.length === 64) {
+      score += 10;
+    }
+
+    // --- Negative signals ---
+
+    // UUID pattern (8-4-4-4-12 with dashes nearby)
+    const uuidContext = text.substring(
+      Math.max(0, text.indexOf(hexString) - 5),
+      Math.min(text.length, text.indexOf(hexString) + hexString.length + 5)
+    );
+    if (/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i.test(surroundingText)) {
+      score -= 100;
+    }
+
+    // CSS/color context
+    if (/#[a-f0-9]{3,8}\b/i.test(uuidContext) ||
+        /\b(color|background|border|rgb|hsl)\s*:/i.test(surroundingText)) {
+      score -= 100;
+    }
+
+    // Inside <a href> or URL path
+    if (parentEl?.tagName === 'A' && parentEl.href) {
+      score -= 50;
+    }
+    if (/\/(api|v[0-9]|path|url|route)\//i.test(surroundingText)) {
+      score -= 30;
+    }
+
+    // Git context — always penalize when git keywords are present,
+    // unless strong CTI labels (not just "hash") are also present
+    if (/\b(commit|merge|branch|git|rebase|cherry-pick)\b/i.test(surroundingText) &&
+        !ctiLabelPatterns.test(surroundingText)) {
+      score -= 50;
+    }
+
+    return Math.max(0, Math.min(100, score));
+  }
 
   // ============================================
   // Utility Functions
@@ -80,12 +211,13 @@
   }
 
   /**
-   * Detect JA4 fingerprint type
+   * Detect fingerprint or file hash type
    */
   function detectType(hash) {
     if (!hash || typeof hash !== 'string') return null;
     const trimmed = hash.trim();
 
+    // JA4 patterns first (more specific due to underscores and structured prefixes)
     // JA4: t13d1516h2_8daaf6152771_b0da82dd1658
     if (/^[tq][0-9]{2}[di][0-9]{4,6}[a-z0-9]{0,4}_[a-f0-9]{12}_[a-f0-9]{12}$/i.test(trimmed)) {
       return 'JA4';
@@ -102,17 +234,32 @@
     if (/^c[0-9]{1,4}s[0-9]{1,4}p[0-9]{1,4}_[io][0-9]{1,4}[io][0-9]{1,4}$/i.test(trimmed)) {
       return 'JA4SSH';
     }
+
+    // File hash detection (longest first to avoid substring matches)
+    if (/^[a-f0-9]{64}$/i.test(trimmed)) return 'SHA256';
+    if (/^[a-f0-9]{40}$/i.test(trimmed)) return 'SHA1';
+    if (/^[a-f0-9]{32}$/i.test(trimmed)) return 'MD5';
+
     return null;
   }
 
   /**
-   * Check if text might be a JA4 fingerprint (for selection)
+   * Check if text might be a JA4 fingerprint or file hash (for selection)
    */
   function mightBeJA4(text) {
     if (!text || text.length < 10 || text.length > 100) return false;
     const trimmed = text.trim();
-    if (!trimmed.includes('_')) return false;
-    return SELECTION_PATTERNS.some(pattern => pattern.test(trimmed));
+    // JA4 fingerprints contain underscores
+    if (trimmed.includes('_')) {
+      return SELECTION_PATTERNS.some(pattern => pattern.test(trimmed));
+    }
+    // File hashes are pure hex of specific lengths
+    if (/^[a-f0-9]{32}$/i.test(trimmed) ||
+        /^[a-f0-9]{40}$/i.test(trimmed) ||
+        /^[a-f0-9]{64}$/i.test(trimmed)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -132,12 +279,21 @@
   // ============================================
 
   /**
-   * Find all JA4 fingerprints in text
+   * Find all JA4 fingerprints and file hashes in text
+   * @param {string} text - Text content to search
+   * @param {Node} [textNode] - The text node (for confidence scoring)
    */
-  function findFingerprints(text) {
+  function findFingerprints(text, textNode) {
     const results = [];
     const seen = new Set();
+    const coveredRanges = [];
 
+    // Helper to check if a position is already covered by a longer match
+    function isRangeCovered(start, end) {
+      return coveredRanges.some(r => start >= r.start && end <= r.end);
+    }
+
+    // JA4 patterns first (higher specificity)
     for (const [type, pattern] of Object.entries(JA4_PATTERNS)) {
       pattern.lastIndex = 0;
       let match;
@@ -147,6 +303,8 @@
 
         if (detectedType && !seen.has(hash.toLowerCase())) {
           seen.add(hash.toLowerCase());
+          const range = { start: match.index, end: match.index + hash.length };
+          coveredRanges.push(range);
           results.push({
             hash,
             type: detectedType,
@@ -154,6 +312,41 @@
             length: hash.length
           });
         }
+      }
+    }
+
+    // File hash patterns (longest first: SHA256 -> SHA1 -> MD5)
+    const hashThreshold = hashCandidateCount > 50 ? 60 : 30;
+    for (const [type, pattern] of Object.entries(FILE_HASH_PATTERNS)) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        const hash = match[0];
+
+        // Skip if this range is already covered by a JA4 match or a longer hash
+        if (isRangeCovered(match.index, match.index + hash.length)) continue;
+        if (seen.has(hash.toLowerCase())) continue;
+
+        // Confidence scoring to reduce false positives
+        if (textNode) {
+          const confidence = scoreHashConfidence(hash, textNode);
+          if (confidence < hashThreshold) {
+            debug(`Skipping low-confidence hash (${confidence}): ${hash.substring(0, 16)}...`);
+            continue;
+          }
+        }
+
+        hashCandidateCount++;
+        seen.add(hash.toLowerCase());
+        const range = { start: match.index, end: match.index + hash.length };
+        coveredRanges.push(range);
+        results.push({
+          hash,
+          type,
+          index: match.index,
+          length: hash.length,
+          isFileHash: true
+        });
       }
     }
 
@@ -237,18 +430,20 @@
   }
 
   /**
-   * Create the fox flag element
+   * Create the flag element (fox for JA4, bug for file hashes)
    */
   function createFoxFlag(hash, type, result) {
+    const isHash = isFileHashType(type);
+
     const flag = document.createElement('span');
-    flag.className = 'jah-flag';
+    flag.className = isHash ? 'jah-flag jah-file-hash' : 'jah-flag';
     flag.setAttribute('data-hash', hash);
     flag.setAttribute('data-type', type);
 
     const img = document.createElement('img');
-    img.src = FOX_ICON_URL;
-    img.alt = 'JA4 Fingerprint';
-    img.className = 'jah-fox-icon';
+    img.src = isHash ? BUG_ICON_URL : FOX_ICON_URL;
+    img.alt = isHash ? 'File Hash' : 'JA4 Fingerprint';
+    img.className = isHash ? 'jah-flag-img jah-bug-icon' : 'jah-fox-icon';
     flag.appendChild(img);
 
     // Create tooltip
@@ -259,6 +454,7 @@
     const hasJa4dbMatch = result.ja4db && result.ja4db.found;
     const hasKnownMatch = result.knownMatch;
     const hasAssessment = result.assessment;
+    const hasThreatIntel = result.threatIntel;
 
     // Check for verified JA4DB records
     const ja4db = result.ja4db;
@@ -326,12 +522,23 @@
       if (isVerified) {
         tooltip.textContent += ' ✓';
       }
+    } else if (isHash && hasThreatIntel) {
+      // File hash with threat intel results
+      const vt = result.threatIntel.virusTotal;
+      if (vt && vt.found) {
+        tooltip.textContent = `${type} - ${vt.maliciousCount}/${vt.totalEngines} VT detections`;
+      } else {
+        tooltip.textContent = `${type} hash detected`;
+      }
     } else if (result.rateLimited) {
       tooltip.textContent = `${type} detected (rate limited)`;
       flag.classList.add('jah-rate-limited');
     } else if (result.error) {
       tooltip.textContent = `${type} detected (lookup error)`;
       flag.classList.add('jah-error');
+    } else if (isHash) {
+      tooltip.textContent = `${type} hash detected`;
+      flag.classList.add('jah-unverified');
     } else {
       tooltip.textContent = `${type} detected (not in JA4DB)`;
     }
@@ -348,7 +555,7 @@
     flag.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      showInlinePanel(flag, hash, type, result);
+      showInlinePanel(flag, hash, type, result, isHash);
     });
 
     return flag;
@@ -358,9 +565,9 @@
   let activePanel = null;
 
   /**
-   * Show inline enrichment panel when fox icon is clicked
+   * Show inline enrichment panel when icon is clicked
    */
-  function showInlinePanel(flagElement, hash, type, cachedResult) {
+  function showInlinePanel(flagElement, hash, type, cachedResult, isHash) {
     // Remove any existing panel
     if (activePanel) {
       activePanel.remove();
@@ -374,7 +581,8 @@
     // Header
     const header = document.createElement('div');
     header.className = 'jah-panel-header';
-    header.innerHTML = `<strong>JA4 Analysis</strong><span class="jah-panel-close">&times;</span>`;
+    const headerTitle = isHash ? 'File Hash Analysis' : 'JA4 Analysis';
+    header.innerHTML = `<strong>${headerTitle}</strong><span class="jah-panel-close">&times;</span>`;
     panel.appendChild(header);
 
     // Hash display
@@ -439,8 +647,9 @@
     }
 
     // Request full enrichment from background
+    const enrichType = isHash ? 'enrich-file-hash' : 'enrich-hash';
     browser.runtime.sendMessage({
-      type: 'enrich-hash',
+      type: enrichType,
       hash: hash,
       fingerprintType: type
     }).then(result => {
@@ -473,6 +682,24 @@
         <div class="jah-panel-label">Identified As:</div>
         <div class="jah-panel-value">${escapeHtml(result.knownMatch.name)}</div>
         <div class="jah-panel-desc">${escapeHtml(result.knownMatch.description || '')}</div>
+      </div>`;
+    }
+
+    // VirusTotal results (for file hashes)
+    const vt = result.threatIntel?.virusTotal;
+    if (vt && vt.found) {
+      html += `<div class="jah-panel-section">
+        <div class="jah-panel-label">VirusTotal:</div>
+        <div class="jah-panel-value">${vt.maliciousCount}/${vt.totalEngines} engines detected</div>
+      </div>`;
+    }
+
+    // MalwareBazaar results (for file hashes)
+    const mb = result.threatIntel?.malwareBazaar;
+    if (mb && mb.found && mb.signature) {
+      html += `<div class="jah-panel-section">
+        <div class="jah-panel-label">Malware Family:</div>
+        <div class="jah-panel-value">${escapeHtml(mb.signature)}</div>
       </div>`;
     }
 
@@ -524,7 +751,7 @@
     if (processedNodes.has(textNode)) return;
 
     const text = textNode.textContent;
-    const fingerprints = findFingerprints(text);
+    const fingerprints = findFingerprints(text, textNode);
 
     if (fingerprints.length === 0) return;
 
@@ -560,9 +787,10 @@
         loadingFlag.innerHTML = '<span class="jah-spinner"></span>';
         wrapper.appendChild(loadingFlag);
 
-        // Perform quick lookup (JA4DB only, no Claude)
+        // Perform quick lookup (JA4DB for JA4, known-fingerprints for hashes)
+        const lookupType = fp.isFileHash ? 'quick-lookup-hash' : 'quick-lookup';
         browser.runtime.sendMessage({
-          type: 'quick-lookup',
+          type: lookupType,
           hash: fp.hash,
           fingerprintType: fp.type
         }).then(lookupResult => {
@@ -631,7 +859,9 @@
 
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent;
-      if (text.includes('_') && text.length > 12) {
+      // Check for JA4 fingerprints (contain underscores) or file hashes (32+ hex chars)
+      if ((text.includes('_') && text.length > 12) ||
+          (text.length >= 32 && /[a-f0-9]{32}/i.test(text))) {
         processTextNode(node);
       }
     } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -708,7 +938,10 @@
         hash: extractJA4FromSelection(selectedText)
       }).then(response => {
         if (response?.isValid) {
-          showTooltip(`JA4 ${response.parsed?.type || 'fingerprint'} detected - right-click to enrich`, rect.left, rect.top);
+          const parsedType = response.parsed?.type || 'fingerprint';
+          const isHash = isFileHashType(parsedType);
+          const label = isHash ? `${parsedType} file hash` : `JA4 ${parsedType}`;
+          showTooltip(`${label} detected - right-click to enrich`, rect.left, rect.top);
         }
       }).catch(() => {});
     } else {
@@ -772,7 +1005,8 @@
             walkDOM(node);
           } else if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent;
-            if (text.includes('_') && text.length > 12) {
+            if ((text.includes('_') && text.length > 12) ||
+                (text.length >= 32 && /[a-f0-9]{32}/i.test(text))) {
               processTextNode(node);
             }
           }

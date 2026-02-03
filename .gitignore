@@ -21,5 +21,17 @@ Thumbs.db
 node_modules/
 .amo-upload-uuid
 
+# Environment and secrets
+.env
+.env.*
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Log files
+*.log
+
 # Claude Code local settings
 .claude/

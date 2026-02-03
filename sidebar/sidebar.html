@@ -32,10 +32,16 @@
           <div class="spinner"></div>
           <p>Analyzing fingerprint...</p>
           <p class="hash-preview" id="loading-hash"></p>
-          <div class="loading-steps">
+          <div class="loading-steps" id="loading-steps-ja4">
             <div class="loading-step" id="step-parse">Parsing fingerprint...</div>
             <div class="loading-step" id="step-ja4db">Querying JA4 Database...</div>
             <div class="loading-step" id="step-analyze">AI Analysis...</div>
+          </div>
+          <div class="loading-steps hidden" id="loading-steps-hash">
+            <div class="loading-step" id="step-hash-parse">Identifying hash type...</div>
+            <div class="loading-step" id="step-hash-vt">Querying VirusTotal...</div>
+            <div class="loading-step" id="step-hash-mb">Querying MalwareBazaar...</div>
+            <div class="loading-step" id="step-hash-analyze">AI Analysis...</div>
           </div>
         </div>
       </div>
@@ -66,6 +72,30 @@
           <div id="summary-section" class="summary-section">
             <h3>Summary</h3>
             <p id="summary-text" class="summary-text"></p>
+          </div>
+
+          <!-- VirusTotal Detection (file hashes only) -->
+          <div id="vt-detection-section" class="vt-detection-section hidden">
+            <h3>VirusTotal Detection</h3>
+            <div class="vt-circle-container">
+              <svg viewBox="0 0 120 120" class="vt-circle-svg">
+                <circle cx="60" cy="60" r="54" class="vt-circle-bg" />
+                <circle cx="60" cy="60" r="54" class="vt-circle-fg" id="vt-circle-fg" />
+                <text x="60" y="55" class="vt-count" id="vt-count">0/0</text>
+                <text x="60" y="72" class="vt-label">detections</text>
+              </svg>
+            </div>
+            <div class="vt-stats" id="vt-stats"></div>
+            <details class="vt-vendor-details">
+              <summary>Vendor Detections</summary>
+              <ul id="vt-vendor-list"></ul>
+            </details>
+          </div>
+
+          <!-- Threat Intel Results (file hashes only) -->
+          <div id="threat-intel-section" class="threat-intel-section hidden">
+            <h3>Threat Intelligence</h3>
+            <div id="threat-intel-content"></div>
           </div>
 
           <!-- JA4 Database Results -->

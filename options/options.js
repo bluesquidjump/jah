@@ -20,6 +20,8 @@
     vtStatus: document.getElementById('vt-status'),
     shodanApiKey: document.getElementById('shodan-api-key'),
     shodanStatus: document.getElementById('shodan-status'),
+    otxApiKey: document.getElementById('otx-api-key'),
+    otxStatus: document.getElementById('otx-status'),
     // Data management
     historyCount: document.getElementById('history-count'),
     clearHistory: document.getElementById('clear-history'),
@@ -70,6 +72,11 @@
         if (config.threatIntel?.shodanApiKey) {
           elements.shodanApiKey.value = config.threatIntel.shodanApiKey;
           updateIntegrationStatus('shodan', true);
+        }
+
+        if (config.threatIntel?.otxApiKey) {
+          elements.otxApiKey.value = config.threatIntel.otxApiKey;
+          updateIntegrationStatus('otx', true);
         }
       }
 
@@ -126,7 +133,8 @@
         threatIntel: {
           virusTotalApiKey: elements.vtApiKey.value.trim() || null,
           shodanApiKey: elements.shodanApiKey.value.trim() || null,
-          enabled: !!(elements.vtApiKey.value.trim() || elements.shodanApiKey.value.trim())
+          otxApiKey: elements.otxApiKey.value.trim() || null,
+          enabled: !!(elements.vtApiKey.value.trim() || elements.shodanApiKey.value.trim() || elements.otxApiKey.value.trim())
         }
       };
 
@@ -136,6 +144,7 @@
       updateIntegrationStatus('brave', !!elements.braveApiKey.value.trim());
       updateIntegrationStatus('vt', !!elements.vtApiKey.value.trim());
       updateIntegrationStatus('shodan', !!elements.shodanApiKey.value.trim());
+      updateIntegrationStatus('otx', !!elements.otxApiKey.value.trim());
 
       showStatus('Settings saved successfully', 'success');
 
@@ -298,7 +307,8 @@
             threatIntel: exportData.mcpConfig.threatIntel ? {
               ...exportData.mcpConfig.threatIntel,
               virusTotalApiKey: null,
-              shodanApiKey: null
+              shodanApiKey: null,
+              otxApiKey: null
             } : null
           };
         }

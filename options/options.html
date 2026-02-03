@@ -118,6 +118,44 @@
             </p>
           </div>
         </div>
+
+        <!-- AlienVault OTX -->
+        <div class="integration-card">
+          <div class="integration-header">
+            <h3>AlienVault OTX</h3>
+            <span class="integration-status" id="otx-status">Not configured</span>
+          </div>
+          <p class="integration-description">
+            Query AlienVault Open Threat Exchange for file hash intelligence and pulse reports.
+          </p>
+          <div class="form-group">
+            <label for="otx-api-key">OTX API Key</label>
+            <div class="input-with-button">
+              <input type="password" id="otx-api-key" placeholder="Enter your OTX API key..." autocomplete="off">
+              <button type="button" class="btn btn-icon toggle-visibility" data-target="otx-api-key">👁</button>
+            </div>
+            <p class="help-text">
+              Get a free API key at <a href="https://otx.alienvault.com/" target="_blank" rel="noopener">otx.alienvault.com</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- MalwareBazaar note -->
+        <div class="integration-card">
+          <div class="integration-header">
+            <h3>MalwareBazaar</h3>
+            <span class="integration-status status-configured">No key required</span>
+          </div>
+          <p class="integration-description">
+            MalwareBazaar (abuse.ch) is queried automatically for file hash lookups. No API key is needed.
+          </p>
+        </div>
+
+        <div class="privacy-notice">
+          <p><strong>Privacy:</strong> File hashes detected on pages you visit will be sent to configured
+          threat intelligence services for enrichment. Only the hash string is transmitted &mdash; never
+          page URLs or user data.</p>
+        </div>
       </section>
 
       <!-- Data Management -->

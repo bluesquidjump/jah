@@ -1110,6 +1110,216 @@ a:hover {
 .confidence-medium { opacity: 0.85; }
 .confidence-low { opacity: 0.7; }
 
+/* ============================================
+   VirusTotal Detection Circle
+   ============================================ */
+
+.vt-detection-section {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--danger);
+  text-align: center;
+}
+
+.vt-detection-section.hidden {
+  display: none;
+}
+
+.vt-detection-section h3 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.vt-circle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.vt-circle-svg {
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+}
+
+.vt-circle-bg {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 8;
+}
+
+.vt-circle-fg {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;
+}
+
+.vt-count {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  fill: var(--text-primary);
+  text-anchor: middle;
+  dominant-baseline: central;
+  /* Counter-rotate text since SVG is rotated */
+  transform: rotate(90deg);
+  transform-origin: 60px 55px;
+}
+
+.vt-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transform: rotate(90deg);
+  transform-origin: 60px 72px;
+}
+
+.vt-stats {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.vt-vendor-details {
+  text-align: left;
+}
+
+.vt-vendor-details summary {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  color: var(--accent-primary);
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 500;
+}
+
+.vt-vendor-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.vt-vendor-details li {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.vt-vendor-details li:last-child {
+  border-bottom: none;
+}
+
+.vt-vendor-malicious {
+  color: var(--danger);
+}
+
+.vt-vendor-suspicious {
+  color: var(--warning);
+}
+
+/* ============================================
+   Threat Intelligence Section
+   ============================================ */
+
+.threat-intel-section {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--warning);
+}
+
+.threat-intel-section.hidden {
+  display: none;
+}
+
+.threat-intel-section h3 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ti-source {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ti-source:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.ti-source h4 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--jah-navy);
+  margin-bottom: 8px;
+}
+
+.ti-item {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.ti-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+}
+
+.ti-value {
+  color: var(--text-primary);
+}
+
+.ti-malware {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.ti-error {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.ti-errors {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* Related applications (different fingerprint type) */
 .ja4db-related {
   flex-direction: column;

@@ -18,6 +18,14 @@
       ja4db: document.getElementById('step-ja4db'),
       analyze: document.getElementById('step-analyze')
     },
+    loadingStepsJa4: document.getElementById('loading-steps-ja4'),
+    loadingStepsHash: document.getElementById('loading-steps-hash'),
+    hashLoadingSteps: {
+      parse: document.getElementById('step-hash-parse'),
+      vt: document.getElementById('step-hash-vt'),
+      mb: document.getElementById('step-hash-mb'),
+      analyze: document.getElementById('step-hash-analyze')
+    },
     errorText: document.getElementById('error-text'),
     retryBtn: document.getElementById('retry-btn'),
     resultType: document.getElementById('result-type'),
@@ -36,6 +44,13 @@
     analysisContent: document.getElementById('analysis-content'),
     mcpSection: document.getElementById('mcp-section'),
     mcpContent: document.getElementById('mcp-content'),
+    vtDetectionSection: document.getElementById('vt-detection-section'),
+    vtCircleFg: document.getElementById('vt-circle-fg'),
+    vtCount: document.getElementById('vt-count'),
+    vtStats: document.getElementById('vt-stats'),
+    vtVendorList: document.getElementById('vt-vendor-list'),
+    threatIntelSection: document.getElementById('threat-intel-section'),
+    threatIntelContent: document.getElementById('threat-intel-content'),
     modelInfo: document.getElementById('model-info'),
     usageInfo: document.getElementById('usage-info'),
     historyToggle: document.getElementById('history-toggle'),
@@ -69,6 +84,19 @@
    */
   function updateLoadingStep(step, status) {
     const stepEl = elements.loadingSteps[step];
+    if (!stepEl) return;
+
+    stepEl.classList.remove('active', 'complete', 'error');
+    if (status) {
+      stepEl.classList.add(status);
+    }
+  }
+
+  /**
+   * Update hash loading step status
+   */
+  function updateHashLoadingStep(step, status) {
+    const stepEl = elements.hashLoadingSteps[step];
     if (!stepEl) return;
 
     stepEl.classList.remove('active', 'complete', 'error');
@@ -408,10 +436,176 @@
   }
 
   /**
+   * Render VirusTotal detection donut chart
+   */
+  function renderVTDetectionCircle(vtData) {
+    if (!vtData || !vtData.found) {
+      elements.vtDetectionSection.classList.add('hidden');
+      return;
+    }
+
+    elements.vtDetectionSection.classList.remove('hidden');
+
+    const malicious = vtData.maliciousCount || 0;
+    const suspicious = vtData.suspiciousCount || 0;
+    const total = vtData.totalEngines || 1;
+    const detected = malicious + suspicious;
+    const ratio = detected / total;
+
+    // Update count text
+    elements.vtCount.textContent = `${detected}/${total}`;
+
+    // Calculate stroke-dashoffset for the circle
+    const circumference = 2 * Math.PI * 54; // r=54
+    const offset = circumference * (1 - ratio);
+
+    elements.vtCircleFg.style.strokeDasharray = `${circumference}`;
+    elements.vtCircleFg.style.strokeDashoffset = `${offset}`;
+
+    // Color based on detection ratio
+    let color;
+    if (ratio > 0.5) color = '#dc2626'; // red
+    else if (ratio > 0.2) color = '#ea580c'; // orange
+    else if (ratio > 0) color = '#d97706'; // amber
+    else color = '#16a34a'; // green
+    elements.vtCircleFg.style.stroke = color;
+
+    // Stats breakdown
+    const stats = vtData.detectionStats || {};
+    elements.vtStats.textContent = `${malicious} malicious / ${suspicious} suspicious / ${(stats.undetected || 0) + (stats.harmless || 0)} clean`;
+
+    // Vendor detections list
+    const vendorList = elements.vtVendorList;
+    vendorList.innerHTML = '';
+    if (vtData.vendorDetections && vtData.vendorDetections.length > 0) {
+      vtData.vendorDetections.forEach(d => {
+        const li = document.createElement('li');
+        li.className = d.category === 'malicious' ? 'vt-vendor-malicious' : 'vt-vendor-suspicious';
+        li.textContent = `${d.vendor}: ${d.result}`;
+        vendorList.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.textContent = 'No detections';
+      vendorList.appendChild(li);
+    }
+  }
+
+  /**
+   * Render threat intelligence results (MalwareBazaar, OTX)
+   */
+  function renderThreatIntelResults(threatContext) {
+    if (!threatContext) {
+      elements.threatIntelSection.classList.add('hidden');
+      return;
+    }
+
+    const mb = threatContext.malwareBazaar;
+    const otx = threatContext.alienVaultOTX;
+    const hasResults = (mb && mb.found) || (otx && otx.found);
+
+    if (!hasResults && (!threatContext.errors || threatContext.errors.length === 0)) {
+      elements.threatIntelSection.classList.add('hidden');
+      return;
+    }
+
+    elements.threatIntelSection.classList.remove('hidden');
+
+    let html = '';
+
+    // MalwareBazaar results
+    if (mb && mb.found) {
+      html += `<div class="ti-source">
+        <h4>MalwareBazaar (abuse.ch)</h4>`;
+      if (mb.signature) html += `<div class="ti-item"><span class="ti-label">Malware Family:</span> <span class="ti-value ti-malware">${escapeHtml(mb.signature)}</span></div>`;
+      if (mb.fileName) html += `<div class="ti-item"><span class="ti-label">File Name:</span> <span class="ti-value">${escapeHtml(mb.fileName)}</span></div>`;
+      if (mb.fileType) html += `<div class="ti-item"><span class="ti-label">File Type:</span> <span class="ti-value">${escapeHtml(mb.fileType)}</span></div>`;
+      if (mb.tags && mb.tags.length > 0) html += `<div class="ti-item"><span class="ti-label">Tags:</span> <span class="ti-value">${mb.tags.map(t => escapeHtml(t)).join(', ')}</span></div>`;
+      if (mb.firstSeen) html += `<div class="ti-item"><span class="ti-label">First Seen:</span> <span class="ti-value">${escapeHtml(mb.firstSeen)}</span></div>`;
+      if (mb.deliveryMethod) html += `<div class="ti-item"><span class="ti-label">Delivery:</span> <span class="ti-value">${escapeHtml(mb.deliveryMethod)}</span></div>`;
+      html += `</div>`;
+    } else if (mb && mb.error) {
+      html += `<div class="ti-source"><h4>MalwareBazaar</h4><p class="ti-error">${escapeHtml(mb.error)}</p></div>`;
+    }
+
+    // AlienVault OTX results
+    if (otx && otx.found) {
+      html += `<div class="ti-source">
+        <h4>AlienVault OTX</h4>
+        <div class="ti-item"><span class="ti-label">Pulses:</span> <span class="ti-value">${otx.pulseCount} threat reports</span></div>`;
+      if (otx.pulseNames && otx.pulseNames.length > 0) {
+        html += `<div class="ti-item"><span class="ti-label">Reports:</span> <span class="ti-value">${otx.pulseNames.map(n => escapeHtml(n)).join(', ')}</span></div>`;
+      }
+      if (otx.malwareFamilies && otx.malwareFamilies.length > 0) {
+        html += `<div class="ti-item"><span class="ti-label">Families:</span> <span class="ti-value">${otx.malwareFamilies.map(f => escapeHtml(f)).join(', ')}</span></div>`;
+      }
+      html += `</div>`;
+    } else if (otx && otx.error) {
+      html += `<div class="ti-source"><h4>AlienVault OTX</h4><p class="ti-error">${escapeHtml(otx.error)}</p></div>`;
+    }
+
+    // Errors
+    if (threatContext.errors && threatContext.errors.length > 0) {
+      html += `<div class="ti-errors"><small>Some lookups failed: ${threatContext.errors.map(e => escapeHtml(e.source)).join(', ')}</small></div>`;
+    }
+
+    elements.threatIntelContent.innerHTML = html;
+  }
+
+  /**
+   * Display file hash results
+   */
+  function displayFileHashResults(result) {
+    showState('results');
+
+    elements.resultType.textContent = result.parsed?.type || 'Hash';
+    elements.resultTimestamp.textContent = formatTimestamp(result.timestamp);
+    elements.resultHash.textContent = result.hash;
+
+    // Render summary with assessment badge
+    renderSummary(result.summary, result.assessment);
+
+    // Show VT detection circle
+    renderVTDetectionCircle(result.threatIntel?.virusTotal);
+
+    // Show threat intel results
+    renderThreatIntelResults(result.threatIntel);
+
+    // Hide JA4-specific sections
+    elements.ja4dbSection.classList.add('hidden');
+    elements.parsedComponents.classList.add('hidden');
+
+    // Render other sections
+    renderKnownMatch(result.knownMatch);
+    renderAnalysis(result.analysis);
+
+    // Hide MCP section for file hashes (threat intel replaces it)
+    elements.mcpSection.classList.add('hidden');
+
+    if (result.model) {
+      elements.modelInfo.textContent = `Model: ${result.model}`;
+    }
+
+    if (result.usage) {
+      elements.usageInfo.textContent = `Tokens: ${result.usage.input_tokens} in / ${result.usage.output_tokens} out`;
+    }
+  }
+
+  /**
    * Display enrichment results
    */
   function displayResults(result) {
+    // Route file hash results to dedicated display
+    if (result.isFileHash) {
+      displayFileHashResults(result);
+      return;
+    }
+
     showState('results');
+
+    // Hide file-hash-specific sections
+    elements.vtDetectionSection.classList.add('hidden');
+    elements.threatIntelSection.classList.add('hidden');
 
     elements.resultType.textContent = result.parsed?.type || 'JA4';
     elements.resultTimestamp.textContent = formatTimestamp(result.timestamp);
@@ -449,10 +643,17 @@
   /**
    * Start enrichment process
    */
-  async function startEnrichment(hash) {
+  async function startEnrichment(hash, isFileHash) {
     // Prevent double-processing
     if (isEnriching && currentHash === hash) {
       return;
+    }
+
+    // Auto-detect file hash if not specified
+    if (isFileHash === undefined) {
+      isFileHash = /^[a-f0-9]{32}$/i.test(hash) ||
+                   /^[a-f0-9]{40}$/i.test(hash) ||
+                   /^[a-f0-9]{64}$/i.test(hash);
     }
 
     isEnriching = true;
@@ -460,24 +661,44 @@
     showState('loading');
     elements.loadingHash.textContent = hash;
 
-    // Reset loading steps
-    updateLoadingStep('parse', 'active');
-    updateLoadingStep('ja4db', '');
-    updateLoadingStep('analyze', '');
+    // Show appropriate loading steps
+    if (isFileHash) {
+      elements.loadingStepsJa4.classList.add('hidden');
+      elements.loadingStepsHash.classList.remove('hidden');
+      updateHashLoadingStep('parse', 'active');
+      updateHashLoadingStep('vt', '');
+      updateHashLoadingStep('mb', '');
+      updateHashLoadingStep('analyze', '');
 
-    try {
-      // Update steps as we progress (simulated since actual work happens in background)
-      setTimeout(() => updateLoadingStep('parse', 'complete'), 200);
+      setTimeout(() => updateHashLoadingStep('parse', 'complete'), 200);
+      setTimeout(() => updateHashLoadingStep('vt', 'active'), 300);
       setTimeout(() => {
-        updateLoadingStep('ja4db', 'active');
-      }, 300);
+        updateHashLoadingStep('vt', 'complete');
+        updateHashLoadingStep('mb', 'active');
+      }, 1000);
+      setTimeout(() => {
+        updateHashLoadingStep('mb', 'complete');
+        updateHashLoadingStep('analyze', 'active');
+      }, 2000);
+    } else {
+      elements.loadingStepsJa4.classList.remove('hidden');
+      elements.loadingStepsHash.classList.add('hidden');
+      updateLoadingStep('parse', 'active');
+      updateLoadingStep('ja4db', '');
+      updateLoadingStep('analyze', '');
+
+      setTimeout(() => updateLoadingStep('parse', 'complete'), 200);
+      setTimeout(() => updateLoadingStep('ja4db', 'active'), 300);
       setTimeout(() => {
         updateLoadingStep('ja4db', 'complete');
         updateLoadingStep('analyze', 'active');
       }, 1500);
+    }
 
+    try {
+      const enrichType = isFileHash ? 'enrich-file-hash' : 'enrich-hash';
       const result = await browser.runtime.sendMessage({
-        type: 'enrich-hash',
+        type: enrichType,
         hash: hash
       });
 
@@ -514,11 +735,12 @@
         const ja4dbBadge = entry.ja4dbFound
           ? '<span class="history-ja4db" title="Found in JA4DB">📗</span>'
           : '';
+        const isFileHash = entry.isFileHash;
 
         html += `
-          <div class="history-item" data-hash="${escapeHtml(entry.hash)}">
+          <div class="history-item" data-hash="${escapeHtml(entry.hash)}" data-file-hash="${isFileHash ? 'true' : 'false'}">
             <div class="history-item-header">
-              <span class="history-type">${escapeHtml(entry.type)}</span>
+              <span class="history-type">${isFileHash ? '🐛 ' : ''}${escapeHtml(entry.type)}</span>
               ${ja4dbBadge}
               <span class="history-time">${formatTimestamp(entry.timestamp)}</span>
             </div>
@@ -535,7 +757,8 @@
       elements.historyList.querySelectorAll('.history-item').forEach(item => {
         item.addEventListener('click', () => {
           const hash = item.dataset.hash;
-          startEnrichment(hash);
+          const isHash = item.dataset.fileHash === 'true';
+          startEnrichment(hash, isHash);
         });
       });
     } catch (error) {
@@ -607,7 +830,9 @@
   // Listen for messages from background script
   browser.runtime.onMessage.addListener((message) => {
     if (message.type === 'enrich-hash') {
-      startEnrichment(message.hash);
+      startEnrichment(message.hash, false);
+    } else if (message.type === 'enrich-file-hash') {
+      startEnrichment(message.hash, true);
     } else if (message.type === 'enrichment-error') {
       displayError(message.error);
     }
@@ -640,7 +865,7 @@
 
       // Start enrichment
       if (pending.hash) {
-        startEnrichment(pending.hash);
+        startEnrichment(pending.hash, pending.isFileHash);
       }
     } catch (error) {
       console.error('Failed to check pending enrichment:', error);

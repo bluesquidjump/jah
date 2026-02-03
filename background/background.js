@@ -13,6 +13,27 @@ let localDbSyncing = false;
 // Cache for quick lookups (page scanning)
 const quickLookupCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const FILE_HASH_CACHE_TTL = 60 * 60 * 1000; // 1 hour (file hashes are immutable)
+
+// File hash enrichment cache
+const fileHashCache = new Map();
+
+// VT rate limiter (separate from JA4 - 4 requests/min for free tier)
+const vtRateLimiter = {
+  requests: [],
+  maxRequests: 4,
+  windowMs: 60000,
+
+  canMakeRequest() {
+    const now = Date.now();
+    this.requests = this.requests.filter(t => now - t < this.windowMs);
+    return this.requests.length < this.maxRequests;
+  },
+
+  recordRequest() {
+    this.requests.push(Date.now());
+  }
+};
 
 // Rate limiting for page scanning
 // Increased from 20 to 100 to handle pages with many fingerprints
@@ -110,70 +131,129 @@ setInterval(() => {
       quickLookupCache.delete(key);
     }
   }
+  for (const [key, value] of fileHashCache.entries()) {
+    if (now - value.timestamp > FILE_HASH_CACHE_TTL) {
+      fileHashCache.delete(key);
+    }
+  }
 }, 60000);
 
-// Create context menu item
+// Create context menu items
 browser.contextMenus.create({
   id: 'jah-enrich',
   title: 'Enrich JA4 Hash',
   contexts: ['selection']
 });
 
+browser.contextMenus.create({
+  id: 'jah-enrich-file-hash',
+  title: 'Enrich File Hash',
+  contexts: ['selection']
+});
+
 // Handle context menu clicks
 browser.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId !== 'jah-enrich') return;
-
   const selectedText = info.selectionText?.trim();
   if (!selectedText) return;
 
-  const isValid = JA4Parser.isValid(selectedText);
+  if (info.menuItemId === 'jah-enrich') {
+    const isValid = JA4Parser.isValid(selectedText);
 
-  // Open sidebar FIRST (must be synchronous from user gesture)
-  browser.sidebarAction.open();
+    // Open sidebar FIRST (must be synchronous from user gesture)
+    browser.sidebarAction.open();
 
-  // Then store pending enrichment and send message asynchronously
-  (async () => {
-    // Store the pending enrichment request
-    try {
-      if (isValid) {
-        await browser.storage.local.set({
-          pendingEnrichment: {
-            hash: selectedText,
-            sourceUrl: tab.url,
-            sourceTitle: tab.title,
-            timestamp: Date.now()
-          }
-        });
-      } else {
-        await browser.storage.local.set({
-          pendingEnrichment: {
-            error: 'Selected text does not appear to be a valid JA4 fingerprint.',
-            text: selectedText,
-            timestamp: Date.now()
-          }
-        });
-      }
-    } catch (e) {
-      console.error('JAH: Failed to store pending enrichment:', e);
-    }
+    (async () => {
+      try {
+        if (isValid) {
+          const parsed = JA4Parser.parse(selectedText);
+          const isHash = parsed && JA4Parser.isFileHash(parsed.type);
 
-    // Send message directly (in case sidebar is already open)
-    if (isValid) {
-      // Small delay to let sidebar initialize if it just opened
-      setTimeout(() => {
-        try {
-          browser.runtime.sendMessage({
-            type: 'enrich-hash',
-            hash: selectedText,
-            sourceUrl: tab.url,
-            sourceTitle: tab.title
+          await browser.storage.local.set({
+            pendingEnrichment: {
+              hash: selectedText,
+              isFileHash: isHash,
+              sourceUrl: tab.url,
+              sourceTitle: tab.title,
+              timestamp: Date.now()
+            }
           });
-        } catch (e) {
-          // Sidebar will pick up from storage
+        } else {
+          await browser.storage.local.set({
+            pendingEnrichment: {
+              error: 'Selected text does not appear to be a valid JA4 fingerprint or file hash.',
+              text: selectedText,
+              timestamp: Date.now()
+            }
+          });
         }
-      }, 100);
-    }
-  })();
+      } catch (e) {
+        console.error('JAH: Failed to store pending enrichment:', e);
+      }
+
+      if (isValid) {
+        const parsed = JA4Parser.parse(selectedText);
+        const isHash = parsed && JA4Parser.isFileHash(parsed.type);
+        const msgType = isHash ? 'enrich-file-hash' : 'enrich-hash';
+
+        setTimeout(() => {
+          try {
+            browser.runtime.sendMessage({
+              type: msgType,
+              hash: selectedText,
+              sourceUrl: tab.url,
+              sourceTitle: tab.title
+            });
+          } catch (e) {
+            // Sidebar will pick up from storage
+          }
+        }, 100);
+      }
+    })();
+  }
+
+  if (info.menuItemId === 'jah-enrich-file-hash') {
+    // Treat selection as a file hash
+    const hashType = JA4Parser.detectFileHashType(selectedText);
+
+    browser.sidebarAction.open();
+
+    (async () => {
+      try {
+        if (hashType) {
+          await browser.storage.local.set({
+            pendingEnrichment: {
+              hash: selectedText.toLowerCase(),
+              isFileHash: true,
+              sourceUrl: tab.url,
+              sourceTitle: tab.title,
+              timestamp: Date.now()
+            }
+          });
+
+          setTimeout(() => {
+            try {
+              browser.runtime.sendMessage({
+                type: 'enrich-file-hash',
+                hash: selectedText.toLowerCase(),
+                sourceUrl: tab.url,
+                sourceTitle: tab.title
+              });
+            } catch (e) {}
+          }, 100);
+        } else {
+          await browser.storage.local.set({
+            pendingEnrichment: {
+              error: 'Selected text does not appear to be a valid file hash (MD5, SHA1, or SHA256).',
+              text: selectedText,
+              timestamp: Date.now()
+            }
+          });
+        }
+      } catch (e) {
+        console.error('JAH: Failed to store pending enrichment:', e);
+      }
+    })();
+  }
 });
 
 // Handle messages from content script and sidebar
@@ -237,6 +317,22 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'configure-mcp') {
     MCPClient.configureIntegration(message.integration, message.settings)
       .then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
+
+  // Quick lookup for file hashes during page scanning (no VT calls)
+  if (message.type === 'quick-lookup-hash') {
+    handleQuickLookupHash(message.hash, message.fingerprintType)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  // Full file hash enrichment (user-initiated)
+  if (message.type === 'enrich-file-hash') {
+    handleFileHashEnrichment(message.hash)
+      .then(result => sendResponse(result))
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true;
   }
@@ -475,6 +571,140 @@ async function handleEnrichment(hash) {
     usage: result.usage,
     timestamp: result.timestamp
   };
+}
+
+/**
+ * Handle quick lookup for file hashes during page scanning
+ * Only checks local known-fingerprints.json, no external API calls
+ */
+async function handleQuickLookupHash(hash, type) {
+  const cacheKey = `hash:${hash.toLowerCase()}`;
+
+  // Check cache first
+  const cached = quickLookupCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.result;
+  }
+
+  const normalizedHash = hash.toLowerCase().trim();
+  const knownMatch = findKnownFingerprint(normalizedHash);
+
+  const result = {
+    hash: normalizedHash,
+    type,
+    isFileHash: true,
+    knownMatch,
+    timestamp: new Date().toISOString()
+  };
+
+  // Determine category from known match
+  if (knownMatch) {
+    result.assessment = {
+      category: knownMatch.category || 'unknown',
+      threatLevel: knownMatch.category === 'malware' ? 'critical' : 'none',
+      confidence: knownMatch.confidence || 'medium'
+    };
+  }
+
+  quickLookupCache.set(cacheKey, { result, timestamp: Date.now() });
+  return result;
+}
+
+/**
+ * Handle full file hash enrichment (user-initiated)
+ * Queries threat intel APIs and Claude
+ */
+async function handleFileHashEnrichment(hash) {
+  const normalizedHash = hash.toLowerCase().trim();
+  const hashType = JA4Parser.detectFileHashType(normalizedHash);
+
+  if (!hashType) {
+    throw new Error('Invalid file hash format');
+  }
+
+  // Check cache (1-hour TTL for file hashes)
+  const cached = fileHashCache.get(normalizedHash);
+  if (cached && Date.now() - cached.timestamp < FILE_HASH_CACHE_TTL) {
+    return cached.result;
+  }
+
+  // Check known fingerprints
+  const knownMatch = findKnownFingerprint(normalizedHash);
+
+  // Get threat intel config
+  const mcpConfig = await MCPClient.getConfig();
+  const threatIntelConfig = {
+    virusTotalApiKey: mcpConfig.threatIntel?.virusTotalApiKey || null,
+    otxApiKey: mcpConfig.threatIntel?.otxApiKey || null
+  };
+
+  // Query all threat intel sources in parallel
+  console.log('JAH: Querying threat intel for file hash:', normalizedHash);
+  const threatContext = await ThreatIntelClient.queryAll(normalizedHash, threatIntelConfig);
+  console.log('JAH: Threat intel results:', {
+    vt: threatContext.virusTotal?.found,
+    mb: threatContext.malwareBazaar?.found,
+    otx: threatContext.alienVaultOTX?.found,
+    errors: threatContext.errors.length
+  });
+
+  // Call Claude for analysis
+  const claudeResult = await ClaudeAPI.enrichFileHash(
+    normalizedHash,
+    hashType,
+    threatContext,
+    knownMatch
+  );
+
+  const result = {
+    success: true,
+    hash: normalizedHash,
+    isFileHash: true,
+    parsed: {
+      type: hashType,
+      raw: normalizedHash,
+      isFileHash: true,
+      components: {
+        hashAlgorithm: hashType,
+        hashValue: normalizedHash,
+        length: normalizedHash.length
+      }
+    },
+    knownMatch,
+    threatIntel: threatContext,
+    summary: claudeResult.summary,
+    assessment: claudeResult.assessment,
+    analysis: claudeResult.analysis,
+    model: claudeResult.model,
+    usage: claudeResult.usage,
+    timestamp: claudeResult.timestamp
+  };
+
+  // Cache result
+  fileHashCache.set(normalizedHash, { result, timestamp: Date.now() });
+
+  // Also cache all hash variants if VT returned them
+  const vt = threatContext.virusTotal;
+  if (vt && vt.found) {
+    const aliases = [vt.sha256, vt.sha1, vt.md5].filter(h => h && h !== normalizedHash);
+    for (const alias of aliases) {
+      fileHashCache.set(alias.toLowerCase(), { result, timestamp: Date.now() });
+    }
+  }
+
+  // Save to history
+  await saveToHistory({
+    hash: normalizedHash,
+    type: hashType,
+    isFileHash: true,
+    knownMatch: knownMatch?.name || null,
+    summary: result.summary || null,
+    assessment: result.assessment || null,
+    timestamp: result.timestamp,
+    analysis: result.analysis
+  });
+
+  return result;
 }
 
 /**

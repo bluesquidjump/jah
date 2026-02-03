@@ -192,6 +192,84 @@
   border-top-color: #ea580c;
 }
 
+/* File hash bug icon */
+.jah-file-hash .jah-bug-icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.jah-file-hash:hover .jah-bug-icon {
+  transform: scale(1.2);
+}
+
+.jah-file-hash .jah-tooltip {
+  white-space: nowrap;
+}
+
+/* Bug icon color coding — malware (red glow) */
+.jah-category-malware .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 12px #ef4444);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+}
+
+/* Bug icon — suspicious (orange glow) */
+.jah-category-suspicious .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #ea580c) drop-shadow(0 0 12px #ea580c);
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.3) 0%, transparent 70%);
+}
+
+/* Bug icon — benign / browser / legitimate (green glow) */
+.jah-category-benign .jah-bug-icon,
+.jah-category-browser .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 12px #22c55e);
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
+}
+
+/* Bug icon — tool (navy glow) */
+.jah-category-tool .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #1e40af) drop-shadow(0 0 12px #1e40af);
+  background: radial-gradient(circle, rgba(30, 64, 175, 0.25) 0%, transparent 70%);
+}
+
+/* Bug icon — bot (orange glow) */
+.jah-category-bot .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #f97316) drop-shadow(0 0 12px #f97316);
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 70%);
+}
+
+/* Bug icon — library (light blue glow) */
+.jah-category-library .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #38bdf8) drop-shadow(0 0 12px #38bdf8);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+}
+
+/* Bug icon — vpn (blue glow) */
+.jah-category-vpn .jah-bug-icon {
+  filter: drop-shadow(0 0 8px #3b82f6) drop-shadow(0 0 12px #3b82f6);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+}
+
+/* Bug icon — verified (purple glow) */
+.jah-verified .jah-bug-icon {
+  filter: drop-shadow(0 0 6px #8b5cf6) drop-shadow(0 0 10px #8b5cf6);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Bug icon — unknown / unverified (grey cloudy glow) */
+.jah-unverified .jah-bug-icon {
+  filter: drop-shadow(0 0 6px #9ca3af) drop-shadow(0 0 10px #9ca3af);
+  background: radial-gradient(circle, rgba(156, 163, 175, 0.3) 0%, transparent 70%);
+}
+
+/* Bug icon — high confidence pulse animation */
+.jah-confident .jah-bug-icon {
+  animation: jah-pulse 2s ease-in-out infinite;
+}
+
 /* Responsive adjustments */
 @media (max-width: 500px) {
   .jah-tooltip {

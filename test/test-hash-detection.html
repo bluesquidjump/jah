@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAH Hash Detection Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #1a1a2e; }
+    h2 { color: #374151; margin-top: 30px; }
+    h3 { color: #4b5563; margin-top: 20px; }
+    .test-case {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: monospace;
+      position: relative;
+    }
+    .test-case.expect-detect {
+      border-left: 4px solid #10b981;
+    }
+    .test-case.expect-skip {
+      border-left: 4px solid #ef4444;
+    }
+    .label {
+      font-family: sans-serif;
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+    .section { margin-bottom: 40px; }
+    .success {
+      background: #d1fae5;
+      border: 1px solid #10b981;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .warning {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .danger {
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 10px 0;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th { background: #f3f4f6; }
+    .results { margin-top: 20px; }
+    #test-results {
+      font-family: monospace;
+      font-size: 13px;
+      background: #1a1a2e;
+      color: #e5e7eb;
+      padding: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>JAH File Hash Detection Test Page</h1>
+  <p>This page tests file hash (MD5, SHA1, SHA256) detection and false positive rejection.</p>
+
+  <!-- ===========================================
+       SECTION 1: Should be detected (with context)
+       =========================================== -->
+  <div class="section">
+    <h2>1. Hashes WITH CTI Context (Should Detect)</h2>
+    <div class="success">
+      <strong>Green border = expected to be detected as file hashes with bug icons</strong>
+    </div>
+
+    <h3>1.1 SHA256 with label</h3>
+    <div class="test-case expect-detect">
+      <div class="label">SHA256 hash with label prefix</div>
+      SHA256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
+    </div>
+
+    <h3>1.2 MD5 with label</h3>
+    <div class="test-case expect-detect">
+      <div class="label">MD5 hash with label prefix</div>
+      MD5: 44d88612fea8a8f36de82e1278abb02f
+    </div>
+
+    <h3>1.3 SHA1 with label</h3>
+    <div class="test-case expect-detect">
+      <div class="label">SHA1 hash with label prefix</div>
+      SHA1: 3395856ce81f2b7382dee72602f798b642f14140
+    </div>
+
+    <h3>1.4 Hash in IOC table</h3>
+    <table>
+      <tr><th>IOC Type</th><th>Indicator</th><th>Description</th></tr>
+      <tr><td>SHA256</td><td>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</td><td>Empty file hash</td></tr>
+      <tr><td>MD5</td><td>d41d8cd98f00b204e9800998ecf8427e</td><td>Empty file hash</td></tr>
+    </table>
+
+    <h3>1.5 Hash in code block</h3>
+    <div class="test-case expect-detect">
+      <div class="label">Inside &lt;code&gt; element</div>
+      File checksum: <code>7b502c3a1f48c8609ae212cdfb639dee39673f5e</code>
+    </div>
+
+    <h3>1.6 Hash with malware context</h3>
+    <div class="test-case expect-detect">
+      <div class="label">Malware context keywords</div>
+      Malware sample hash: ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa
+    </div>
+
+    <h3>1.7 Multiple hashes (IOC list signal)</h3>
+    <div class="test-case expect-detect">
+      <div class="label">Multiple hashes indicate IOC list</div>
+      Threat indicators:<br>
+      SHA256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<br>
+      SHA256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb<br>
+      SHA256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc<br>
+      SHA256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+    </div>
+  </div>
+
+  <!-- ===========================================
+       SECTION 2: Should NOT be detected
+       =========================================== -->
+  <div class="section">
+    <h2>2. False Positives (Should NOT Detect)</h2>
+    <div class="danger">
+      <strong>Red border = should NOT be detected as file hashes</strong>
+    </div>
+
+    <h3>2.1 UUID</h3>
+    <div class="test-case expect-skip">
+      <div class="label">UUID - 32 hex chars but with dashes</div>
+      Resource ID: 550e8400-e29b-41d4-a716-446655440000
+    </div>
+
+    <h3>2.2 CSS Colors</h3>
+    <div class="test-case expect-skip">
+      <div class="label">CSS color values</div>
+      <span style="color: #ff6b35ff;">background-color: #ff6b35ff applied here</span>
+    </div>
+
+    <h3>2.3 Git Commit Hash (no IOC context)</h3>
+    <div class="test-case expect-skip">
+      <div class="label">Git commit without hash/IOC keywords</div>
+      commit a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2<br>
+      Author: developer<br>
+      merge branch 'feature' into main
+    </div>
+
+    <h3>2.4 URL Path Segment</h3>
+    <div class="test-case expect-skip">
+      <div class="label">Hex string in URL path</div>
+      <a href="https://example.com/api/v1/resources/abcdef1234567890abcdef1234567890">Resource Link</a>
+    </div>
+  </div>
+
+  <!-- ===========================================
+       SECTION 3: JA4 Regression
+       =========================================== -->
+  <div class="section">
+    <h2>3. JA4 Fingerprint Regression</h2>
+    <div class="warning">
+      <strong>JA4 fingerprints should still show fox icons (not bug icons)</strong>
+    </div>
+
+    <div class="test-case expect-detect">
+      <div class="label">JA4 TLS fingerprint (should show fox icon)</div>
+      t13d1517h2_8daaf6152771_b0da82dd1658
+    </div>
+
+    <div class="test-case expect-detect">
+      <div class="label">JA4S fingerprint (should show fox icon)</div>
+      t130200_1301_234ea6891581
+    </div>
+
+    <div class="test-case expect-detect">
+      <div class="label">JA4H fingerprint (should show fox icon)</div>
+      ge11cn20enus_60ca1bd65281_ac95b44401d9_8df6a44f726c
+    </div>
+
+    <div class="test-case expect-detect">
+      <div class="label">JA4SSH fingerprint (should show fox icon)</div>
+      c76s56p21_i76o21
+    </div>
+  </div>
+
+  <!-- ===========================================
+       SECTION 4: Mixed Content
+       =========================================== -->
+  <div class="section">
+    <h2>4. Mixed Content (JA4 + File Hashes)</h2>
+    <p>This paragraph mixes both types. The JA4 fingerprint t13d1517h2_8daaf6152771_b0da82dd1658
+    should get a fox icon, while the malware hash
+    SHA256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
+    should get a bug icon.</p>
+  </div>
+
+  <!-- ===========================================
+       SECTION 5: Substring Collision Test
+       =========================================== -->
+  <div class="section">
+    <h2>5. Substring Collision Prevention</h2>
+    <div class="warning">
+      A SHA256 hash should NOT also match as an MD5 or SHA1.
+      Only ONE icon should appear per hash.
+    </div>
+
+    <div class="test-case expect-detect">
+      <div class="label">SHA256 - should show exactly ONE bug icon (SHA256 type)</div>
+      Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    </div>
+  </div>
+
+  <hr>
+  <p><em>Hash Detection Test Page for JAH Firefox Extension v1.2.0</em></p>
+</body>
+</html>

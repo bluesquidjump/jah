@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "JAH - JA4 Hash Enrichment",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "Enrich JA4 fingerprint hashes with threat intelligence using Claude AI",
   "author": "Security Tools",
   "browser_specific_settings": {
@@ -16,7 +16,10 @@
     "activeTab",
     "alarms",
     "https://api.anthropic.com/*",
-    "https://ja4db.com/*"
+    "https://ja4db.com/*",
+    "https://www.virustotal.com/*",
+    "https://mb-api.abuse.ch/*",
+    "https://otx.alienvault.com/*"
   ],
   "icons": {
     "16": "icons/kitsune-16.png",
@@ -29,6 +32,7 @@
       "lib/ja4-parser.js",
       "lib/ja4db-client.js",
       "lib/ja4db-local.js",
+      "lib/threat-intel-client.js",
       "lib/claude-api.js",
       "lib/mcp-client.js",
       "background/background.js"
@@ -64,6 +68,8 @@
     }
   ],
   "web_accessible_resources": [
-    "icons/ja4-fox-flag.png"
-  ]
+    "icons/ja4-fox-flag.png",
+    "icons/hash-bug.svg"
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }

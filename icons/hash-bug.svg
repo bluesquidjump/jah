@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Bug/beetle icon for file hash indicators -->
+  <!-- Body -->
+  <ellipse cx="16" cy="18" rx="7" ry="9" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+  <!-- Shell line -->
+  <line x1="16" y1="9" x2="16" y2="27" stroke="#2d3748" stroke-width="1"/>
+  <!-- Shell cross lines -->
+  <line x1="9.5" y1="15" x2="22.5" y2="15" stroke="#2d3748" stroke-width="0.8"/>
+  <line x1="9.2" y1="20" x2="22.8" y2="20" stroke="#2d3748" stroke-width="0.8"/>
+  <!-- Head -->
+  <circle cx="16" cy="10" r="4" fill="#2d3748"/>
+  <!-- Eyes -->
+  <circle cx="14.2" cy="9.2" r="1" fill="#e2e8f0"/>
+  <circle cx="17.8" cy="9.2" r="1" fill="#e2e8f0"/>
+  <!-- Antennae -->
+  <path d="M14 7 Q12 3 10 2" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M18 7 Q20 3 22 2" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <circle cx="10" cy="2" r="1" fill="#2d3748"/>
+  <circle cx="22" cy="2" r="1" fill="#2d3748"/>
+  <!-- Legs - left -->
+  <path d="M10 13 Q6 11 4 12" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M9.5 17 Q5 17 3 18" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M10 22 Q6 24 4 25" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Legs - right -->
+  <path d="M22 13 Q26 11 28 12" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M22.5 17 Q27 17 29 18" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M22 22 Q26 24 28 25" stroke="#2d3748" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+</svg>
