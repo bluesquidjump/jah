@@ -104,23 +104,46 @@ In `content.js determineCategory()`:
 
 ## Release Process
 
-When changes are complete and ready for release:
-1. Bump version in `manifest.json`
+When prompted to prepare a new release, perform ALL of the following steps automatically:
+
+1. Bump version in `manifest.json` and `sidebar/sidebar.html` footer
 2. Commit all changes with descriptive message
-3. Sign extension with Mozilla:
+3. Create git tag: `git tag -a vX.X.X -m "Release notes"`
+4. Push commits and tag: `git push origin main && git push origin vX.X.X`
+5. Sign extension with Mozilla:
    ```bash
    web-ext sign --api-key="$MOZILLA_API_KEY" --api-secret="$MOZILLA_API_SECRET" --channel=unlisted
    ```
-4. Create git tag: `git tag -a vX.X.X -m "Release notes"`
-5. Push commits and tag: `git push origin main && git push origin vX.X.X`
-6. Create GitHub Release with signed XPI: `gh release create vX.X.X --title "..." --notes "..." <xpi-file>`
+6. Create GitHub Release and upload the signed XPI:
+   ```bash
+   gh release create vX.X.X --title "..." --notes "..." <signed-xpi-file>
+   ```
 
 **IMPORTANT:**
-- Always use the `$MOZILLA_API_KEY` and `$MOZILLA_API_SECRET` environment variables for signing - they are already configured
+- `MOZILLA_API_KEY` and `MOZILLA_API_SECRET` are configured in `~/.bashrc` (above the interactive guard). These are available as environment variables in all shells — use them directly, never hardcode credentials
+- Always sign the XPI and upload it to the GitHub Release as part of the release process
 - Always create and push a new GitHub Release when changes are complete - do not wait to be asked
 - Never commit credentials to the repository
 
 ## Recent Changes
+
+### v1.2.1
+- Improved file hash confidence scoring for CTI pages (CrowdStrike, Mandiant, Unit42, etc.)
+- Added page prescan for hash candidates before DOM walk
+- Semantic element scores accumulate (e.g., `<code>` inside `<td>` = 25pts)
+- Table header CTI keyword checking with `<thead>` and first-`<tr>` fallback
+- Unified context menu into single "JAH Hash Enrichment" with auto-detection
+- Sidebar only shows loading steps relevant to the hash type being analyzed
+- Added generic `.hidden` CSS rule, updated sidebar subtitle
+
+### v1.2.0
+- File hash detection (MD5, SHA1, SHA256) with confidence scoring to reduce false positives
+- Threat intel enrichment via VirusTotal, MalwareBazaar, and AlienVault OTX
+- Bug icon for file hash indicators (distinct from JA4 fox icons)
+- SVG donut chart for VirusTotal detection ratios in sidebar
+- Client-side LLM output validation guardrails
+- `lib/threat-intel-client.js` — new API client for threat intel services
+- OTX API key configuration in options page
 
 ### v1.1.8
 - Added local JA4DB using IndexedDB for instant lookups (~258K records)
